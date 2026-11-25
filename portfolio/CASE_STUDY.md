@@ -6,7 +6,8 @@ Studi kasus portofolio. Aplikasi internal untuk toko gadget second: menilai harg
 - **Stack:** Go, MySQL 8, HTML + Tailwind, HTMX
 - **Konteks:** toko barang second, multi-cabang
 - **Status:** pilot internal, belum produksi
-- **Halaman visual:** [index.html](index.html)
+- **Halaman visual:** https://mangarah.github.io/prediksi/
+- **Kode:** https://github.com/mangarah/prediksi
 
 ![Dashboard Prediksi](assets/dashboard.png)
 

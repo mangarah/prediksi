@@ -2,6 +2,8 @@
 
 Studi kasus visual dan tertulis untuk sistem harga & stok barang second.
 
+**Live: https://mangarah.github.io/prediksi/**
+
 ## Isi folder
 
 | Path | Isi |
