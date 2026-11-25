@@ -1,0 +1,81 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Stok opname</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Bandingkan unit siap jual dengan hitungan fisik.</p>
+  </div>
+  <a href="/laporan" class="inline-flex items-center px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Kembali ke laporan</a>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm self-start">
+    <h2 class="text-base font-semibold text-slate-900">Hitung fisik</h2>
+    <p class="text-xs text-slate-500 font-medium mt-0.5">Tempel/scan kode unit, satu per baris.</p>
+    <form method="post" action="/opname" class="mt-4 space-y-4">
+      {{if or (eq .User.Role "owner") (eq .User.Role "manajer")}}
+      <div>
+        <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="branch">Cabang</label>
+        <select id="branch" name="branch" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500">
+          {{range .Data.Branches}}<option value="{{.ID}}" {{if eq .ID $.Data.BranchID}}selected{{end}}>{{.Name}}</option>{{end}}
+        </select>
+      </div>
+      {{end}}
+      <div>
+        <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="codes">Kode unit ditemukan</label>
+        <textarea id="codes" name="codes" rows="8" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" placeholder="PS5-0142&#10;NSW-0088">{{.Data.Codes}}</textarea>
+      </div>
+      <button type="submit" class="w-full py-3 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800">Hitung selisih</button>
+    </form>
+  </div>
+
+  <div class="lg:col-span-7 space-y-6">
+    {{if .Data.Result}}
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm"><p class="text-xs font-semibold text-slate-500">Sistem</p><p class="text-2xl font-medium mt-1">{{.Data.Result.Expected}}</p></div>
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm"><p class="text-xs font-semibold text-slate-500">Ditemukan</p><p class="text-2xl font-medium text-emerald-600 mt-1">{{.Data.Result.Found}}</p></div>
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm"><p class="text-xs font-semibold text-slate-500">Tidak ditemukan</p><p class="text-2xl font-medium text-rose-500 mt-1">{{len .Data.Result.Missing}}</p></div>
+    </div>
+
+    {{if .Data.Result.Missing}}
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <h2 class="text-sm font-semibold text-slate-900 p-5 pb-3">Unit tidak ditemukan</h2>
+      <div class="divide-y divide-slate-100">
+        {{range .Data.Result.Missing}}
+        <div class="px-5 py-3 flex items-center justify-between text-xs">
+          <div><p class="font-semibold text-slate-900">№{{.Code}}</p><p class="text-xs text-slate-500">{{.Model}} {{.Variant}} · {{.Grade}} · {{.AgeDays}} hari</p></div>
+          <a href="/label/{{.ID}}" class="text-teal-700 font-semibold hover:text-teal-700">Label</a>
+        </div>
+        {{end}}
+      </div>
+    </div>
+    {{end}}
+
+    {{if .Data.Result.Extra}}
+    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+      <h2 class="text-sm font-semibold text-slate-900">Kode tidak dikenal sistem</h2>
+      <p class="text-xs font-medium text-rose-500 mt-2">{{range .Data.Result.Extra}}{{.}} · {{end}}</p>
+    </div>
+    {{end}}
+    {{end}}
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <div class="flex items-center justify-between p-5 pb-3">
+        <h2 class="text-sm font-semibold text-slate-900">Unit seharusnya ada</h2>
+        <span class="text-xs font-semibold text-slate-500">{{len .Data.Units}} unit</span>
+      </div>
+      <div class="overflow-x-auto max-h-80 overflow-y-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead><tr class="border-y border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500">
+            <th scope="col" class="py-2.5 pl-5 pr-3">Kode</th><th scope="col" class="py-2.5 px-3">Model</th><th scope="col" class="py-2.5 px-3">Umur</th><th scope="col" class="py-2.5 pr-5 pl-3 text-right">Label</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+            {{range .Data.Units}}
+            <tr><td class="py-2.5 pl-5 pr-3 font-semibold text-slate-900">{{.Code}}</td><td class="py-2.5 px-3">{{.Model}} {{.Variant}}</td><td class="py-2.5 px-3">{{.AgeDays}} hari</td><td class="py-2.5 pr-5 pl-3 text-right"><a href="/label/{{.ID}}" class="text-teal-700 font-semibold">Label</a></td></tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{{end}}

@@ -1,0 +1,183 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Kasir</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Catat penjualan unit dan cetak nota.</p>
+  </div>
+  <div class="flex items-center space-x-2">
+    <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white border border-slate-100 text-xs font-semibold text-slate-700 shadow-sm">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{len .Data.Sales}} transaksi hari ini
+    </span>
+    <a href="/persetujuan" class="inline-flex items-center px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition">Persetujuan</a>
+  </div>
+</section>
+
+<div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+  <form method="get" action="/unit" class="flex flex-col sm:flex-row gap-2 mb-5">
+    <input name="code" required placeholder="Scan atau ketik kode unit (mis. PS5-0005)" class="flex-1 rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium" />
+    <button type="submit" class="px-4 py-2.5 rounded-2xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors whitespace-nowrap">Buka unit</button>
+  </form>
+  <form method="get" action="/kasir" class="flex flex-col sm:flex-row sm:items-end gap-3">
+    <div class="flex-1">
+      <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="unit-pick">Pilih unit siap jual</label>
+      <select id="unit-pick" name="unit" class="w-full bg-slate-50 border-0 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-teal-600 focus:outline-none">
+        {{range .Data.Units}}
+        <option value="{{.ID}}" {{if and $.Data.Selected (eq .ID $.Data.Selected.ID)}}selected{{end}}>№{{.Code}} · {{.Model}} {{.Variant}} · Grade {{.Grade}} · {{rp .ListedPrice}}</option>
+        {{else}}
+        <option value="">Tidak ada unit siap jual</option>
+        {{end}}
+      </select>
+    </div>
+    <button type="submit" class="px-5 py-3 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800  transition active:scale-95 whitespace-nowrap">Muat unit</button>
+  </form>
+  <p class="text-xs text-slate-500 font-medium mt-3">Unit berstatus servis atau menunggu persetujuan tidak bisa dijual.</p>
+</div>
+
+{{if .Data.Selected}}
+<form method="post" action="/kasir/jual">
+  <input type="hidden" name="unit_id" value="{{.Data.Selected.ID}}" />
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-7 xl:col-span-8 space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="flex items-start justify-between gap-3 p-6 pb-4">
+          <div class="flex items-start gap-4">
+            {{if .Data.Selected.Photo}}<img src="{{.Data.Selected.Photo}}" alt="Foto {{.Data.Selected.Model}}" class="w-16 h-16 rounded-2xl object-cover ring-1 ring-slate-100" />{{end}}
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-semibold text-slate-900">{{.Data.Selected.Model}} {{.Data.Selected.Variant}}</h2>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">siap jual</span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium mt-1">№{{.Data.Selected.Code}} · Grade {{.Data.Selected.Grade}} · {{.Data.Selected.Branch}} · {{.Data.Selected.AgeDays}} hari</p>
+              <a href="/label/{{.Data.Selected.ID}}" target="_blank" class="inline-flex mt-1 text-xs font-semibold text-teal-700 hover:text-teal-700">Cetak label</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 divide-x divide-slate-100 border-y border-slate-100 bg-slate-50/50">
+          <div class="p-4 text-center">
+            <p class="text-xs font-semibold text-slate-500">Modal</p>
+            <p class="text-sm font-semibold text-slate-900 mt-1">{{if .Data.ShowProfit}}{{rp .Data.Selected.Cost}}{{else}}—{{end}}</p>
+          </div>
+          <div class="p-4 text-center">
+            <p class="text-xs font-semibold text-slate-500">Rekomendasi</p>
+            <p class="text-sm font-semibold text-teal-700 mt-1">{{rp .Data.Selected.ListedPrice}}</p>
+          </div>
+          <div class="p-4 text-center">
+            <p class="text-xs font-semibold text-slate-500">Minimal</p>
+            <p class="text-sm font-semibold text-slate-900 mt-1">{{rp .Data.Selected.MinPrice}}</p>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="harga-jual">Harga jual</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-xs font-semibold text-slate-500 pointer-events-none">Rp</span>
+                <input id="harga-jual" name="price" value="{{num .Data.Price}}" type="text" inputmode="numeric"
+                  hx-get="/kasir/ringkasan" hx-trigger="input changed delay:300ms" hx-include="closest form" hx-target="#ringkasan" hx-swap="innerHTML"
+                  class="w-full rounded-2xl border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-base font-semibold text-slate-900 focus:border-teal-500 focus:ring-teal-500" />
+              </div>
+              <p class="text-xs text-slate-500 font-medium mt-1.5">Di bawah {{rp .Data.Selected.MinPrice}} butuh persetujuan.</p>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="diskon">Diskon</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-xs font-semibold text-slate-500 pointer-events-none">Rp</span>
+                <input id="diskon" name="discount" value="{{num .Data.Discount}}" type="text" inputmode="numeric"
+                  hx-get="/kasir/ringkasan" hx-trigger="input changed delay:300ms" hx-include="closest form" hx-target="#ringkasan" hx-swap="innerHTML"
+                  class="w-full rounded-2xl border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-base font-semibold text-slate-900 focus:border-teal-500 focus:ring-teal-500" />
+              </div>
+              <p class="text-xs text-slate-500 font-medium mt-1.5">Total nota = harga − diskon.</p>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-xs font-semibold text-slate-600 mb-2 block">Metode bayar</span>
+            <div class="grid grid-cols-3 gap-2">
+              {{$method := .Data.Method}}
+              <label class="flex items-center justify-center gap-2 px-3 py-3 rounded-2xl text-xs font-semibold cursor-pointer transition {{if eq $method "tunai"}}bg-slate-900 text-white ring-2 ring-slate-900{{else}}bg-white border border-slate-200 text-slate-700 hover:bg-slate-50{{end}}">
+                <input class="sr-only" type="radio" name="method" value="tunai" {{if eq $method "tunai"}}checked{{end}} />Tunai
+              </label>
+              <label class="flex items-center justify-center gap-2 px-3 py-3 rounded-2xl text-xs font-semibold cursor-pointer transition {{if eq $method "transfer"}}bg-slate-900 text-white ring-2 ring-slate-900{{else}}bg-white border border-slate-200 text-slate-700 hover:bg-slate-50{{end}}">
+                <input class="sr-only" type="radio" name="method" value="transfer" {{if eq $method "transfer"}}checked{{end}} />Transfer
+              </label>
+              <label class="flex items-center justify-center gap-2 px-3 py-3 rounded-2xl text-xs font-semibold cursor-pointer transition {{if eq $method "qris"}}bg-slate-900 text-white ring-2 ring-slate-900{{else}}bg-white border border-slate-200 text-slate-700 hover:bg-slate-50{{end}}">
+                <input class="sr-only" type="radio" name="method" value="qris" {{if eq $method "qris"}}checked{{end}} />QRIS
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="pembeli">Nama pembeli <span class="text-slate-500 font-medium">(opsional)</span></label>
+              <input id="pembeli" name="buyer" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium placeholder-slate-400 focus:border-teal-500 focus:ring-teal-500" placeholder="Nama pembeli" type="text" />
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="garansi">Garansi toko</label>
+              <select id="garansi" name="warranty" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 focus:border-teal-500 focus:ring-teal-500">
+                <option value="14">14 hari — konsol</option>
+                <option value="7">7 hari — aksesoris</option>
+                <option value="3">3 hari — game</option>
+                <option value="0">Tanpa garansi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-5 xl:col-span-4 space-y-6">
+      {{template "ringkasan" .Data}}
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+        <h2 class="text-sm font-semibold text-slate-900">Alur penjualan</h2>
+        <ol class="mt-3 space-y-2 text-xs font-medium text-slate-500 list-decimal list-inside">
+          <li>Harga di bawah minimal ditolak sistem.</li>
+          <li>Unit langsung berstatus terjual.</li>
+          <li>Laba dan data harga tercatat otomatis.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</form>
+{{else}}
+<div class="bg-white rounded-3xl p-10 border border-slate-100 shadow-sm text-center">
+  <p class="text-sm font-semibold text-slate-900">Belum ada unit siap jual</p>
+  <p class="text-xs text-slate-500 font-medium mt-2">Catat pembelian dulu, lalu unit muncul di sini setelah disetujui.</p>
+  <a href="/pembelian" class="inline-flex mt-5 px-4 py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">Catat pembelian</a>
+</div>
+{{end}}
+
+<div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+  <div class="flex items-center justify-between p-5 border-b border-slate-100">
+    <h2 class="text-sm font-semibold text-slate-900">Terjual hari ini</h2>
+    <span class="text-xs font-semibold text-slate-500">{{len .Data.Sales}} transaksi</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-xs">
+      <thead>
+        <tr class="bg-slate-50/50 text-xs font-semibold text-slate-500">
+          <th scope="col" class="py-3 pl-6 pr-3">Nota</th>
+          <th scope="col" class="py-3 px-3">Unit</th>
+          <th scope="col" class="py-3 px-3">Total</th>
+          <th scope="col" class="py-3 px-3">Metode</th>
+          <th scope="col" class="py-3 pr-6 pl-3 text-right">Waktu</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+        {{range .Data.Sales}}
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-3.5 pl-6 pr-3 font-semibold text-slate-900"><a href="/nota/{{.ID}}" class="hover:text-teal-700" title="Buka nota">№{{.Invoice}}</a></td>
+          <td class="py-3.5 px-3 text-slate-600">{{.Unit}}</td>
+          <td class="py-3.5 px-3 font-semibold text-slate-900">{{rp .Total}}</td>
+          <td class="py-3.5 px-3 text-slate-600">{{methodLabel .Method}}</td>
+          <td class="py-3.5 pr-6 pl-3 text-right text-slate-500">{{.Time}}</td>
+        </tr>
+        {{else}}
+        <tr><td colspan="5" class="py-8 text-center text-slate-500 font-medium">Belum ada penjualan hari ini.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{end}}

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediksi — Dashboard Toko</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            canvas: '#F4F7FC',
+          },
+          borderRadius: { '2xl': '1.25rem', '3xl': '1.75rem' },
+        },
+      },
+    };
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .bar-column { transition: all .25s cubic-bezier(.4,0,.2,1); }
+    .bar-column:hover { opacity: .85; transform: scaleY(1.03); transform-origin: bottom; }
+    .donut-segment { transition: stroke-width .2s ease, opacity .2s ease; cursor: pointer; }
+    .donut-segment:hover { stroke-width: 26; opacity: .9; }
+  </style>
+</head>
+<body class="bg-canvas text-slate-800 font-sans antialiased min-h-screen flex selection:bg-indigo-500 selection:text-white">
+
+  <!-- Sidebar -->
+  <aside class="w-20 bg-white border-r border-slate-100 flex flex-col items-center justify-between py-6 fixed top-0 bottom-0 left-0 z-40">
+    <div class="flex flex-col items-center space-y-6">
+      <a class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 hover:bg-indigo-100 transition shadow-sm" href="#dashboard" title="Prediksi">
+        <svg class="w-6 h-6 stroke-current fill-none" stroke-width="2.2" viewBox="0 0 24 24">
+          <path d="M4 8c2.5-3 5.5-3 8 0s5.5 3 8 0M4 12c2.5-3 5.5-3 8 0s5.5 3 8 0M4 16c2.5-3 5.5-3 8 0s5.5 3 8 0" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+
+      <nav aria-label="Navigasi utama" class="flex flex-col items-center space-y-3">
+        <a class="w-11 h-11 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-md shadow-slate-900/10 transition-transform active:scale-95" href="#dashboard" title="Dashboard">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="w-11 h-11 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition" href="cek-harga.html" title="Cek harga">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="w-11 h-11 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition" href="#stok" title="Stok">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="w-11 h-11 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition" href="kasir.html" title="Kasir">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="w-11 h-11 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition" href="persetujuan.html" title="Persetujuan">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="w-11 h-11 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition" href="#prediksi" title="Prediksi & saran beli">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="w-11 h-11 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition" href="#laporan" title="Laporan">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="w-11 h-11 rounded-2xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition" href="#pengaturan" title="Pengaturan">
+          <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+      </nav>
+    </div>
+
+    <div class="flex flex-col items-center">
+      <button class="w-11 h-11 rounded-2xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition" title="Keluar">
+        <svg class="w-5 h-5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="ml-20 flex-1 p-6 lg:p-8 max-w-[1600px] mx-auto space-y-8">
+
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3 w-full max-w-xl">
+        <div class="relative w-full max-w-sm">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <input class="w-full bg-white border-0 ring-1 ring-slate-200/80 rounded-2xl pl-10 pr-4 py-2.5 text-sm font-medium placeholder-slate-400 shadow-sm focus:ring-2 focus:ring-indigo-600 focus:outline-none transition" placeholder="Cari model atau nomor seri" type="search" />
+        </div>
+        <button class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-white border border-slate-100 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Cabang Pusat
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex items-center space-x-3 self-end md:self-auto">
+        <div class="hidden sm:flex items-center px-4 py-2 rounded-2xl bg-white border border-slate-100 text-xs font-semibold text-indigo-600 shadow-sm">
+          Sen, 24 Nov 2026
+        </div>
+        <button aria-label="Notifikasi" class="relative w-10 h-10 rounded-2xl bg-white border border-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center shadow-sm hover:shadow transition">
+          <svg class="w-4 h-4 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+        </button>
+        <div class="w-10 h-10 rounded-2xl overflow-hidden ring-2 ring-indigo-50 shadow-sm bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm" title="Owner">
+          <span>K</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Greeting -->
+    <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+          Halo, Kazoku! <span class="animate-pulse">👋</span>
+        </h1>
+        <p class="text-sm text-slate-500 font-medium mt-1">Ini ringkasan toko hari ini.</p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button class="inline-flex items-center space-x-2 px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition">
+          <span>Hari ini</span>
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button class="w-9 h-9 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 shadow-sm hover:bg-slate-50 transition" title="Pilih rentang tanggal">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- KPI -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5" aria-label="Ringkasan hari ini">
+      <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-indigo-600/20 relative overflow-hidden flex flex-col justify-between h-48 transition transform hover:-translate-y-0.5">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-indigo-100">Laba hari ini</span>
+          <button class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition" aria-label="Buka laporan laba">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <div class="flex items-baseline space-x-2">
+            <span class="text-3xl font-extrabold tracking-tight">Rp 4.850.000</span>
+            <span class="inline-flex items-center text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300">↑ 12,4%</span>
+          </div>
+          <p class="text-xs text-indigo-200 mt-2 font-medium">Dibanding kemarin</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-48 transition transform hover:-translate-y-0.5">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold text-slate-600">Penjualan hari ini</span>
+          <button class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" aria-label="Buka daftar penjualan">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <div class="flex items-baseline space-x-2">
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">12 <span class="text-xl font-bold text-slate-800">unit</span></span>
+            <span class="inline-flex items-center text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">↑ 8,3%</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-2 font-medium">Dibanding kemarin</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-48 transition transform hover:-translate-y-0.5">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold text-slate-600">Stok siap jual</span>
+          <button class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" aria-label="Buka daftar stok">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <div class="flex items-baseline space-x-2">
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">184 <span class="text-xl font-bold text-slate-800">unit</span></span>
+            <span class="inline-flex items-center text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">↑ 6 unit</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-2 font-medium">Nilai stok Rp 512.400.000</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-48 transition transform hover:-translate-y-0.5">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold text-slate-600">Stok mengendap</span>
+          <button class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" aria-label="Lihat stok lebih dari 30 hari">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <div class="flex items-baseline space-x-2">
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">9 <span class="text-xl font-bold text-slate-800">unit</span></span>
+            <span class="inline-flex items-center text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">↑ 3 unit</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-2 font-medium">Lebih dari 30 hari belum laku</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Highlight widgets -->
+      <div class="lg:col-span-4 xl:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-5">
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm relative flex flex-col justify-between">
+          <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="mt-8">
+            <h3 class="text-3xl font-extrabold text-slate-900 tracking-tight">3 <span class="text-xl font-bold text-slate-800">persetujuan</span></h3>
+            <p class="text-xs text-slate-400 mt-1 font-medium">2 pembelian di atas <span class="text-rose-500 font-semibold">batas beli</span>.</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <svg class="absolute -right-8 -bottom-6 w-44 h-44 opacity-25 pointer-events-none text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 200 200">
+            <path d="M0,100 C50,150 150,50 200,100 C150,150 50,50 0,100 Z" stroke-width="1.5" />
+            <path d="M10,110 C60,160 160,60 210,110" stroke-width="1.5" />
+            <path d="M-10,90 C40,140 140,40 190,90" stroke-width="1.5" />
+          </svg>
+          <div class="flex items-center justify-between z-10">
+            <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <button class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md hover:bg-slate-800 transition" aria-label="Buka kas harian">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="mt-8 z-10">
+            <h3 class="text-3xl font-extrabold text-slate-900 tracking-tight">Rp 12,45 <span class="text-xl font-bold text-slate-800">jt</span></h3>
+            <p class="text-xs text-slate-400 mt-1 font-medium">Kas cabang, selisih <span class="text-emerald-600 font-semibold">Rp 0</span>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar chart -->
+      <div class="lg:col-span-8 xl:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <h2 class="text-base font-bold text-slate-900">Penjualan</h2>
+            <span class="text-xs text-slate-400 font-medium">7 hari terakhir</span>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition" aria-label="Buka laporan penjualan">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="pt-6 pb-2">
+          <div class="flex items-end h-56 w-full space-x-2 sm:space-x-3.5">
+            <div class="flex flex-col justify-between h-full text-[10px] font-semibold text-slate-400 pr-2 select-none">
+              <span>Rp 8 jt</span>
+              <span>Rp 6 jt</span>
+              <span>Rp 4 jt</span>
+              <span>Rp 2 jt</span>
+              <span>Rp 0</span>
+            </div>
+
+            <div class="flex-1 flex flex-col items-center h-full justify-end group">
+              <div class="w-full max-w-[2.25rem] bg-indigo-600 rounded-t-xl bar-column" style="height: 78%;"></div>
+              <span class="text-[10px] font-semibold text-slate-400 mt-3">18 Nov</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center h-full justify-end group">
+              <div class="w-full max-w-[2.25rem] bg-indigo-600 rounded-t-xl bar-column" style="height: 48%;"></div>
+              <span class="text-[10px] font-semibold text-slate-400 mt-3">19 Nov</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center h-full justify-end group relative">
+              <div class="absolute -top-3 text-[10px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100 -translate-y-1 whitespace-nowrap">Rp 4.800.000</div>
+              <div class="w-full max-w-[2.25rem] bg-indigo-600 rounded-t-xl bar-column ring-2 ring-indigo-300/40" style="height: 60%;"></div>
+              <span class="text-[10px] font-bold text-slate-800 mt-3">20 Nov</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center h-full justify-end group">
+              <div class="w-full max-w-[2.25rem] bg-indigo-600 rounded-t-xl bar-column" style="height: 55%;"></div>
+              <span class="text-[10px] font-semibold text-slate-400 mt-3">21 Nov</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center h-full justify-end group">
+              <div class="w-full max-w-[2.25rem] bg-indigo-600 rounded-t-xl bar-column" style="height: 68%;"></div>
+              <span class="text-[10px] font-semibold text-slate-400 mt-3">22 Nov</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center h-full justify-end group">
+              <div class="w-full max-w-[2.25rem] bg-indigo-600 rounded-t-xl bar-column" style="height: 84%;"></div>
+              <span class="text-[10px] font-semibold text-slate-400 mt-3">23 Nov</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center h-full justify-end group">
+              <div class="w-full max-w-[2.25rem] bg-indigo-600 rounded-t-xl bar-column" style="height: 94%;"></div>
+              <span class="text-[10px] font-semibold text-slate-400 mt-3">24 Nov</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut -->
+      <div class="lg:col-span-12 xl:col-span-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2">
+            <h2 class="text-base font-bold text-slate-900">Penjualan per kategori</h2>
+            <span class="text-xs text-slate-400 font-medium">30 hari</span>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition" aria-label="Buka laporan kategori">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 py-4">
+          <div class="relative w-44 h-44 flex items-center justify-center shrink-0">
+            <svg class="w-44 h-44 -rotate-90 transform" viewBox="0 0 160 160" role="img" aria-label="Komposisi penjualan per kategori">
+              <circle cx="80" cy="80" fill="transparent" r="54" stroke="#f1f5f9" stroke-width="22"></circle>
+              <circle class="donut-segment" cx="80" cy="80" fill="transparent" r="54" stroke="#3b82f6" stroke-dasharray="152.68 186.61" stroke-dashoffset="0" stroke-width="22"></circle>
+              <circle class="donut-segment" cx="80" cy="80" fill="transparent" r="54" stroke="#f97316" stroke-dasharray="91.61 247.68" stroke-dashoffset="-152.68" stroke-width="22"></circle>
+              <circle class="donut-segment" cx="80" cy="80" fill="transparent" r="54" stroke="#10b981" stroke-dasharray="61.07 278.22" stroke-dashoffset="-244.29" stroke-width="22"></circle>
+              <circle class="donut-segment" cx="80" cy="80" fill="transparent" r="54" stroke="#f43f5e" stroke-dasharray="33.93 305.36" stroke-dashoffset="-305.36" stroke-width="22"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span class="text-lg font-extrabold text-slate-800">184</span>
+              <span class="text-[10px] font-semibold text-slate-400">unit terjual</span>
+            </div>
+          </div>
+
+          <div class="space-y-2.5 w-full text-xs font-medium text-slate-600">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center space-x-2 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>
+                <span class="truncate">Konsol</span>
+              </div>
+              <span class="font-bold text-slate-800 shrink-0">45%</span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center space-x-2 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0"></span>
+                <span class="truncate">Game</span>
+              </div>
+              <span class="font-bold text-slate-800 shrink-0">27%</span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center space-x-2 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                <span class="truncate">Aksesoris</span>
+              </div>
+              <span class="font-bold text-slate-800 shrink-0">18%</span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center space-x-2 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0"></span>
+                <span class="truncate">Lainnya</span>
+              </div>
+              <span class="font-bold text-slate-800 shrink-0">10%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stok -->
+    <section class="space-y-6 pt-4" id="stok">
+      <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Stok &amp; unit</h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-indigo-500"></div>
+          <span class="text-xs font-semibold text-slate-500">Siap jual</span>
+          <div class="flex items-baseline space-x-2.5 mt-3">
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">184</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">↑ 6</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">dari minggu lalu</span>
+        </div>
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-orange-400"></div>
+          <span class="text-xs font-semibold text-slate-500">Dalam servis</span>
+          <div class="flex items-baseline space-x-2.5 mt-3">
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">7</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">↓ 1</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">dari minggu lalu</span>
+        </div>
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-amber-400"></div>
+          <span class="text-xs font-semibold text-slate-500">Menunggu persetujuan</span>
+          <div class="flex items-baseline space-x-2.5 mt-3">
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">3</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">↑ 2</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">dari minggu lalu</span>
+        </div>
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-emerald-400"></div>
+          <span class="text-xs font-semibold text-slate-500">Terjual hari ini</span>
+          <div class="flex items-baseline space-x-2.5 mt-3">
+            <span class="text-3xl font-extrabold text-slate-900 tracking-tight">12</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">↑ 8,3%</span>
+          </div>
+          <span class="text-[11px] text-slate-400 mt-1 block">dibanding kemarin</span>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="relative w-72">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <input class="w-full bg-slate-50 border-0 rounded-2xl pl-9 pr-3 py-2 text-xs font-medium placeholder-slate-400 focus:ring-2 focus:ring-indigo-600 focus:outline-none" placeholder="Cari model / nomor seri" type="text" />
+            </div>
+            <span class="text-xs font-bold text-slate-500 whitespace-nowrap">184 unit</span>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <button class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-2xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span>Ekspor</span>
+            </button>
+            <button class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-2xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 4h18M3 8h12m-12 4h6m10 4l-4 4m0 0l-4-4m4 4V10" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span>Urut: terbaru</span>
+            </button>
+            <button class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 shadow-md shadow-slate-900/10 transition active:scale-95">
+              <span class="text-sm leading-none">+</span>
+              <span>Catat pembelian</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="w-7 h-7 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-slate-100 text-[11px] font-semibold text-slate-700">
+              <span>Konsol</span>
+              <button aria-label="Hapus filter Konsol" class="hover:text-slate-900 font-bold">✕</button>
+            </span>
+            <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-slate-100 text-[11px] font-semibold text-slate-700">
+              <span>Cabang Pusat</span>
+              <button aria-label="Hapus filter Cabang Pusat" class="hover:text-slate-900 font-bold">✕</button>
+            </span>
+            <button class="text-[11px] font-semibold text-slate-400 hover:text-slate-700 ml-1">Hapus semua (2)</button>
+          </div>
+
+          <div class="flex items-center space-x-3 text-xs font-semibold text-slate-500">
+            <span>1 dari 12</span>
+            <div class="flex items-center space-x-1">
+              <button aria-label="Halaman sebelumnya" class="w-7 h-7 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-50">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+              <button aria-label="Halaman berikutnya" class="w-7 h-7 rounded-xl border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto -mx-4">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-y border-slate-100 bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <th scope="col" class="py-3.5 pl-6 pr-3 w-10">
+                  <input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih semua unit" />
+                </th>
+                <th scope="col" class="py-3.5 px-3">Unit</th>
+                <th scope="col" class="py-3.5 px-3">Model</th>
+                <th scope="col" class="py-3.5 px-3">Grade</th>
+                <th scope="col" class="py-3.5 px-3">Modal</th>
+                <th scope="col" class="py-3.5 px-3">Harga jual</th>
+                <th scope="col" class="py-3.5 px-3">Umur</th>
+                <th scope="col" class="py-3.5 px-3">Cabang</th>
+                <th scope="col" class="py-3.5 px-3">Status</th>
+                <th scope="col" class="py-3.5 pr-6 pl-3 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+              <tr class="hover:bg-slate-50/60 transition">
+                <td class="py-4 pl-6 pr-3"><input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih PS5-0142" /></td>
+                <td class="py-4 px-3 font-semibold text-slate-900">№PS5-0142</td>
+                <td class="py-4 px-3">
+                  <div class="font-semibold text-slate-900">PS5 Slim Disc 1TB</div>
+                  <div class="text-[11px] text-slate-400">SN 8842-1190</div>
+                </td>
+                <td class="py-4 px-3 text-slate-600">A</td>
+                <td class="py-4 px-3 text-slate-600">Rp 5.900.000</td>
+                <td class="py-4 px-3 font-semibold text-slate-900">Rp 7.200.000</td>
+                <td class="py-4 px-3 text-slate-500">4 hari</td>
+                <td class="py-4 px-3 text-slate-600">Pusat</td>
+                <td class="py-4 px-3">
+                  <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
+                    <span>siap jual</span>
+                    <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </div>
+                </td>
+                <td class="py-4 pr-6 pl-3 text-right">
+                  <button class="text-slate-400 hover:text-slate-700 p-1" title="Aksi unit" aria-label="Aksi unit PS5-0142">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/60 transition">
+                <td class="py-4 pl-6 pr-3"><input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih NSW-0088" /></td>
+                <td class="py-4 px-3 font-semibold text-slate-900">№NSW-0088</td>
+                <td class="py-4 px-3">
+                  <div class="font-semibold text-slate-900">Nintendo Switch OLED</div>
+                  <div class="text-[11px] text-slate-400">SN 7712-0043</div>
+                </td>
+                <td class="py-4 px-3 text-slate-600">B</td>
+                <td class="py-4 px-3 text-slate-600">Rp 3.450.000</td>
+                <td class="py-4 px-3 font-semibold text-slate-900">Rp 4.700.000</td>
+                <td class="py-4 px-3 text-slate-500">12 hari</td>
+                <td class="py-4 px-3 text-slate-600">Pusat</td>
+                <td class="py-4 px-3">
+                  <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
+                    <span>siap jual</span>
+                    <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </div>
+                </td>
+                <td class="py-4 pr-6 pl-3 text-right">
+                  <button class="text-slate-400 hover:text-slate-700 p-1" title="Aksi unit" aria-label="Aksi unit NSW-0088">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/60 transition">
+                <td class="py-4 pl-6 pr-3"><input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih PS4-0231" /></td>
+                <td class="py-4 px-3 font-semibold text-slate-900">№PS4-0231</td>
+                <td class="py-4 px-3">
+                  <div class="font-semibold text-slate-900">PS4 Pro 1TB</div>
+                  <div class="text-[11px] text-slate-400">SN 5521-8890</div>
+                </td>
+                <td class="py-4 px-3 text-slate-600">C</td>
+                <td class="py-4 px-3 text-slate-600">Rp 2.100.000</td>
+                <td class="py-4 px-3 font-semibold text-slate-900">Rp 2.850.000</td>
+                <td class="py-4 px-3 text-slate-500">9 hari</td>
+                <td class="py-4 px-3 text-slate-600">Cabang A</td>
+                <td class="py-4 px-3">
+                  <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[11px] font-semibold">
+                    <span>servis</span>
+                    <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </div>
+                </td>
+                <td class="py-4 pr-6 pl-3 text-right">
+                  <button class="text-slate-400 hover:text-slate-700 p-1" title="Aksi unit" aria-label="Aksi unit PS4-0231">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/60 transition">
+                <td class="py-4 pl-6 pr-3"><input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih GME-1104" /></td>
+                <td class="py-4 px-3 font-semibold text-slate-900">№GME-1104</td>
+                <td class="py-4 px-3">
+                  <div class="font-semibold text-slate-900">Spider-Man 2 (PS5)</div>
+                  <div class="text-[11px] text-slate-400">Kaset, lengkap</div>
+                </td>
+                <td class="py-4 px-3 text-slate-600">A</td>
+                <td class="py-4 px-3 text-slate-600">Rp 420.000</td>
+                <td class="py-4 px-3 font-semibold text-slate-900">Rp 650.000</td>
+                <td class="py-4 px-3 font-bold text-amber-600">31 hari</td>
+                <td class="py-4 px-3 text-slate-600">Pusat</td>
+                <td class="py-4 px-3">
+                  <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
+                    <span>siap jual</span>
+                    <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </div>
+                </td>
+                <td class="py-4 pr-6 pl-3 text-right">
+                  <button class="text-slate-400 hover:text-slate-700 p-1" title="Aksi unit" aria-label="Aksi unit GME-1104">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/60 transition">
+                <td class="py-4 pl-6 pr-3"><input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih PS5-0150" /></td>
+                <td class="py-4 px-3 font-semibold text-slate-900">№PS5-0150</td>
+                <td class="py-4 px-3">
+                  <div class="font-semibold text-slate-900">PS5 Slim Digital 825GB</div>
+                  <div class="text-[11px] text-slate-400">SN 8843-0021</div>
+                </td>
+                <td class="py-4 px-3 text-slate-600">A</td>
+                <td class="py-4 px-3 text-slate-600">Rp 6.350.000</td>
+                <td class="py-4 px-3 font-semibold text-slate-900">—</td>
+                <td class="py-4 px-3 text-slate-500">1 hari</td>
+                <td class="py-4 px-3 text-slate-600">Pusat</td>
+                <td class="py-4 px-3">
+                  <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 text-[11px] font-semibold">
+                    <span>menunggu</span>
+                    <svg class="w-3 h-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </div>
+                </td>
+                <td class="py-4 pr-6 pl-3 text-right">
+                  <button class="text-slate-400 hover:text-slate-700 p-1" title="Aksi unit" aria-label="Aksi unit PS5-0150">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/60 transition">
+                <td class="py-4 pl-6 pr-3"><input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih ACC-0455" /></td>
+                <td class="py-4 px-3 font-semibold text-slate-900">№ACC-0455</td>
+                <td class="py-4 px-3">
+                  <div class="font-semibold text-slate-900">DualSense Controller</div>
+                  <div class="text-[11px] text-slate-400">Putih, tanpa dus</div>
+                </td>
+                <td class="py-4 px-3 text-slate-600">B</td>
+                <td class="py-4 px-3 text-slate-600">Rp 520.000</td>
+                <td class="py-4 px-3 font-semibold text-slate-900">Rp 780.000</td>
+                <td class="py-4 px-3 text-slate-500">22 hari</td>
+                <td class="py-4 px-3 text-slate-600">Cabang A</td>
+                <td class="py-4 px-3">
+                  <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
+                    <span>siap jual</span>
+                    <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </div>
+                </td>
+                <td class="py-4 pr-6 pl-3 text-right">
+                  <button class="text-slate-400 hover:text-slate-700 p-1" title="Aksi unit" aria-label="Aksi unit ACC-0455">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50/60 transition">
+                <td class="py-4 pl-6 pr-3"><input class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" aria-label="Pilih NSW-0077" /></td>
+                <td class="py-4 px-3 font-semibold text-slate-900">№NSW-0077</td>
+                <td class="py-4 px-3">
+                  <div class="font-semibold text-slate-900">Switch Pro Controller</div>
+                  <div class="text-[11px] text-slate-400">Hitam, lengkap</div>
+                </td>
+                <td class="py-4 px-3 text-slate-600">B</td>
+                <td class="py-4 px-3 text-slate-600">Rp 610.000</td>
+                <td class="py-4 px-3 font-semibold text-slate-900">Rp 850.000</td>
+                <td class="py-4 px-3 text-slate-500">5 hari</td>
+                <td class="py-4 px-3 text-slate-600">Pusat</td>
+                <td class="py-4 px-3">
+                  <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold">
+                    <span>terjual</span>
+                    <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+                  </div>
+                </td>
+                <td class="py-4 pr-6 pl-3 text-right">
+                  <button class="text-slate-400 hover:text-slate-700 p-1" title="Aksi unit" aria-label="Aksi unit NSW-0077">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

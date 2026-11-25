@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nota {{.Sale.Invoice}} — Prediksi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] }, borderRadius: { '2xl': '0.75rem', '3xl': '1rem' } } } };
+  </script>
+  <style>
+    body { font-variant-numeric: tabular-nums; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; padding: 0 !important; }
+      .nota-card { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen p-6 flex justify-center">
+  <div class="w-full max-w-lg">
+    <div class="no-print flex items-center justify-between mb-4">
+      <a href="/kasir" class="text-xs font-semibold text-slate-500 hover:text-slate-800">← Kembali ke kasir</a>
+      <div class="flex items-center gap-2">
+        <a href="https://wa.me/?text={{urlquery (printf "Nota %s — %s %s, total %s. Terima kasih." .Sale.Invoice .Sale.Model .Sale.Variant (rp .Sale.Total))}}" target="_blank" rel="noopener" class="px-4 py-2 rounded-2xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50">Kirim WhatsApp</a>
+        <button onclick="window.print()" class="px-4 py-2 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">Cetak / Simpan PDF</button>
+      </div>
+    </div>
+
+    {{if .Sale.VoidedAt}}
+    <div class="no-print mb-4 rounded-2xl bg-rose-50 border border-rose-100 px-4 py-3 text-xs font-semibold text-rose-700">
+      Dibatalkan {{.Sale.VoidedAt}} oleh {{.Sale.VoidedBy}} — {{.Sale.VoidReason}}
+    </div>
+    {{end}}
+
+    <div class="nota-card bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-lg font-semibold tracking-tight">Prediksi</h1>
+          <p class="text-xs font-medium text-slate-500 mt-0.5">Toko barang second · {{.Sale.Branch}}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs font-semibold text-slate-500">Nota</p>
+          <p class="text-sm font-semibold text-slate-900">{{.Sale.Invoice}}</p>
+          <p class="text-xs font-medium text-slate-500">{{.Sale.SoldAt}}</p>
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-2 gap-4 text-xs">
+        <div>
+          <p class="text-xs font-semibold text-slate-500">Pembeli</p>
+          <p class="font-semibold text-slate-900 mt-0.5">{{if .Sale.Buyer}}{{.Sale.Buyer}}{{else}}—{{end}}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs font-semibold text-slate-500">Pembayaran</p>
+          <p class="font-semibold text-slate-900 mt-0.5">{{methodLabel .Sale.Method}}</p>
+        </div>
+      </div>
+
+      <div class="mt-6 border-t border-slate-100 pt-4">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-sm font-semibold text-slate-900">{{.Sale.Model}} {{.Sale.Variant}}</p>
+            <p class="text-xs font-medium text-slate-500">№{{.Sale.UnitCode}} · Grade {{.Sale.Grade}}{{if .Sale.Serial}} · {{.Sale.Serial}}{{end}}</p>
+          </div>
+          <p class="text-sm font-semibold text-slate-900">{{rp .Sale.Price}}</p>
+        </div>
+        {{if gt .Sale.Discount 0}}
+        <div class="flex items-center justify-between mt-2 text-xs">
+          <span class="text-slate-500 font-medium">Diskon</span>
+          <span class="font-semibold text-rose-500">− {{rp .Sale.Discount}}</span>
+        </div>
+        {{end}}
+      </div>
+
+      <div class="mt-4 border-t border-slate-100 pt-4 flex items-center justify-between">
+        <span class="text-sm font-semibold text-slate-900">Total</span>
+        <span class="text-2xl font-medium tracking-tight text-slate-900">{{rp .Sale.Total}}</span>
+      </div>
+
+      <div class="mt-6 rounded-2xl bg-slate-50 px-4 py-3 text-xs font-medium text-slate-500">
+        Garansi toko: {{if gt .Sale.Warranty 0}}{{.Sale.Warranty}} hari{{else}}tanpa garansi{{end}} sejak tanggal nota. Simpan nota ini sebagai bukti klaim.
+      </div>
+
+      <p class="text-center text-xs font-medium text-slate-500 mt-6">Terima kasih sudah berbelanja.</p>
+    </div>
+
+    {{if and (not .Sale.VoidedAt) (or (eq .User.Role "owner") (eq .User.Role "manajer"))}}
+    <form method="post" action="/nota/{{.Sale.ID}}/batal" class="no-print mt-4 rounded-2xl border border-slate-200 bg-white p-4 flex flex-col sm:flex-row gap-3">
+      <input name="reason" required minlength="3" placeholder="Alasan pembatalan (wajib)" class="flex-1 rounded-xl border-slate-200 bg-slate-50 text-sm" />
+      <button type="submit" class="px-4 py-2.5 rounded-xl bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 transition-colors">Batalkan penjualan</button>
+    </form>
+    {{end}}
+  </div>
+</body>
+</html>

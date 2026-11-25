@@ -1,0 +1,115 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Data harga</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Input harga penjual, pesaing, dan marketplace.</p>
+  </div>
+  <form method="get" action="/data-harga" class="flex items-center gap-2">
+    <select name="model" class="rounded-2xl border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+      <option value="">Semua model</option>
+      {{range .Data.Models}}<option value="{{.ID}}" {{if eq .ID $.Data.Selected.ID}}selected{{end}}>{{.Name}} · {{.Variant}}</option>{{end}}
+    </select>
+    <button class="px-3 py-2 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">Filter</button>
+  </form>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="lg:col-span-5 xl:col-span-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm self-start">
+    <h2 class="text-base font-semibold text-slate-900">Input harga baru</h2>
+    <p class="text-xs text-slate-500 font-medium mt-0.5">Data disimpan dengan tanggal hari ini.</p>
+
+    <form method="post" action="/data-harga" class="mt-5 space-y-4">
+      <div>
+        <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="model">Model</label>
+        <select id="model" name="model" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500">
+          {{range .Data.Models}}<option value="{{.ID}}:{{.VariantID}}" {{if and (eq .ID $.Data.Selected.ID) (eq .VariantID $.Data.Selected.VariantID)}}selected{{end}}>{{.Name}} · {{.Variant}}</option>{{end}}
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="grade">Grade</label>
+          <select id="grade" name="grade" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500">
+            {{range .Data.Grades}}<option value="{{.}}">{{.}}</option>{{end}}
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="series">Seri</label>
+          <select id="series" name="series" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500">
+            <option value="sell">Harga jual</option>
+            <option value="buy">Harga beli / tawaran</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="source">Sumber</label>
+          <select id="source" name="source" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500">
+            <option value="pesaing">Toko pesaing</option>
+            <option value="marketplace">Marketplace</option>
+            <option value="penjual">Tawaran penjual</option>
+            <option value="toko">Penjualan toko</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="price">Harga</label>
+          <input id="price" name="price" inputmode="numeric" placeholder="7.200.000" required class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="note">Catatan <span class="text-slate-500 font-medium">(opsional)</span></label>
+        <input id="note" name="note" placeholder="Nama toko / link listing" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium placeholder-slate-400 focus:border-teal-500 focus:ring-teal-500" />
+      </div>
+      <div>
+        <span class="text-xs font-semibold text-slate-600 mb-2 block">Kelengkapan</span>
+        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
+          {{range .Data.Accessories}}
+          <label class="flex items-center gap-2 text-xs font-medium text-slate-600"><input class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" type="checkbox" name="acc" value="{{.Code}}" checked />{{.Label}}</label>
+          {{end}}
+        </div>
+      </div>
+      <button type="submit" class="w-full py-3 rounded-2xl bg-teal-700 text-white text-sm font-semibold hover:bg-teal-800 shadow-sm transition">Simpan harga</button>
+      <p class="text-xs text-slate-500 font-medium text-center">Harga beli dan harga jual dihitung sebagai dua seri terpisah.</p>
+    </form>
+  </div>
+
+  <div class="lg:col-span-7 xl:col-span-8 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between p-6 pb-4">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">Riwayat harga</h2>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">30 data terbaru{{if .Data.Selected.Name}} · {{.Data.Selected.Name}}{{end}}</p>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="border-y border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500">
+            <th scope="col" class="py-3 pl-6 pr-3">Tanggal</th>
+            <th scope="col" class="py-3 px-3">Model</th>
+            <th scope="col" class="py-3 px-3">Grade</th>
+            <th scope="col" class="py-3 px-3">Seri</th>
+            <th scope="col" class="py-3 px-3">Sumber</th>
+            <th scope="col" class="py-3 pr-6 pl-3 text-right">Harga</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+          {{range .Data.Rows}}
+          <tr class="hover:bg-slate-50/60 transition">
+            <td class="py-3.5 pl-6 pr-3 text-slate-500">{{.ObservedAt.Format "02 Jan 2006"}}</td>
+            <td class="py-3.5 px-3">
+              <div class="font-semibold text-slate-900">{{.Model}} {{.Variant}}</div>
+              {{if .Note}}<div class="text-xs text-slate-500">{{.Note}}</div>{{end}}
+            </td>
+            <td class="py-3.5 px-3 text-slate-600">{{.Grade}}</td>
+            <td class="py-3.5 px-3">{{if eq .Series "buy"}}<span class="inline-flex px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">beli</span>{{else}}<span class="inline-flex px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">jual</span>{{end}}</td>
+            <td class="py-3.5 px-3 text-slate-600">{{sourceLabel .Source}}</td>
+            <td class="py-3.5 pr-6 pl-3 text-right font-semibold text-slate-900">{{rp .Price}}</td>
+          </tr>
+          {{else}}
+          <tr><td colspan="6" class="py-10 text-center text-slate-500 font-medium">Belum ada data harga.</td></tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{{end}}

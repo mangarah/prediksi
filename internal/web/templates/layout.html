@@ -1,0 +1,171 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{.Title}} — Prediksi</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          colors: { canvas: '#f6f7f8' },
+          borderRadius: { '2xl': '0.75rem', '3xl': '1rem' },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-variant-numeric: tabular-nums; }
+    h1, h2, h3 { letter-spacing: -0.02em; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .bar-column { transition: opacity .15s ease; }
+    .bar-column:hover { opacity: .8; }
+    .donut-segment { transition: stroke-width .2s ease, opacity .2s ease; cursor: pointer; }
+    .donut-segment:hover { stroke-width: 26; opacity: .9; }
+    @media print { .no-print { display: none !important; } body { background: #fff; } }
+  </style>
+</head>
+<body class="bg-canvas text-slate-800 font-sans antialiased min-h-screen flex selection:bg-teal-700 selection:text-white">
+
+  <aside class="w-16 lg:w-60 bg-white border-r border-slate-100 flex flex-col justify-between py-6 fixed top-0 bottom-0 left-0 z-40">
+    <div class="flex flex-col space-y-6 w-full">
+      <a class="flex items-center justify-center lg:justify-start gap-3 lg:px-5" href="/" title="Prediksi">
+        <span class="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6 stroke-current fill-none" stroke-width="2.2" viewBox="0 0 24 24">
+            <path d="M4 8c2.5-3 5.5-3 8 0s5.5 3 8 0M4 12c2.5-3 5.5-3 8 0s5.5 3 8 0M4 16c2.5-3 5.5-3 8 0s5.5 3 8 0" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="hidden lg:block text-base font-semibold tracking-tight text-slate-900">Prediksi</span>
+      </a>
+      <nav aria-label="Navigasi utama" class="flex flex-col gap-1 max-h-[calc(100vh-180px)] overflow-y-auto no-scrollbar w-full px-3">
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer")}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "dashboard"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/dashboard" title="Dashboard">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Dashboard</span>
+        </a>
+        {{end}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "cekharga"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/cek-harga" title="Cek harga">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Cek harga</span>
+        </a>
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer") (eq .User.Role "buyer")}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "dataharga"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/data-harga" title="Data harga">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h10M4 18h7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Data harga</span>
+        </a>
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "pembelian"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/pembelian" title="Pembelian">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Pembelian</span>
+        </a>
+        {{end}}
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer") (eq .User.Role "kasir")}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "kasir"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/kasir" title="Kasir">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Kasir</span>
+        </a>
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "kas"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/kas" title="Kas harian">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Kas harian</span>
+        </a>
+        {{end}}
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer") (eq .User.Role "kasir")}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "tukar"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/tukar-tambah" title="Tukar tambah">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h12m0 0l-3-3m3 3l-3 3M16 17H4m0 0l3 3m-3-3l3-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Tukar tambah</span>
+        </a>
+        {{end}}
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer")}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "transfer"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/transfer" title="Transfer antar cabang">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1h-3m6 0h1a1 1 0 001-1v-4l-3-3h-4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Transfer</span>
+        </a>
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "laporan"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/laporan" title="Laporan">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Laporan</span>
+        </a>
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "demand"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/prediksi" title="Prediksi & saran beli">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Prediksi</span>
+        </a>
+        {{end}}
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer")}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "persetujuan"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/persetujuan" title="Persetujuan">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Persetujuan</span>
+          {{if gt .Pending 0}}<span class="hidden lg:inline ms-auto text-xs font-medium text-slate-500">{{.Pending}}</span>{{end}}
+        </a>
+        {{end}}
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer")}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "katalog"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/katalog" title="Katalog">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Katalog</span>
+        </a>
+        {{end}}
+        {{if eq .User.Role "owner"}}
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "pengguna"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/pengguna" title="Pengguna">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Pengguna</span>
+        </a>
+        <a class="flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start transition-colors {{if eq .Nav "pengaturan"}}bg-slate-900 text-white {{else}}text-slate-500 hover:text-slate-900 hover:bg-slate-100{{end}}" href="/pengaturan" title="Pengaturan">
+          <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="hidden lg:inline text-sm font-medium">Pengaturan</span>
+        </a>
+        {{end}}
+      </nav>
+    </div>
+    <form method="post" action="/logout" class="px-3">
+      <button type="submit" class="w-full flex items-center gap-3 h-10 px-3 rounded-xl justify-center lg:justify-start text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="Keluar ({{.User.Name}})">
+        <svg class="w-5 h-5 shrink-0 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="hidden lg:inline text-sm font-medium">Keluar</span>
+      </button>
+    </form>
+  </aside>
+
+  <main class="ml-16 lg:ml-60 flex-1 min-w-0 p-6 lg:p-8 max-w-[1600px] mx-auto space-y-8">
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3 w-full max-w-xl">
+        <form action="/cek-harga" method="get" class="relative w-full max-w-sm">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </span>
+          <input name="q" value="{{.Query}}" class="w-full bg-white border-0 ring-1 ring-slate-200/80 rounded-2xl pl-10 pr-4 py-2.5 text-sm font-medium placeholder-slate-400 shadow-sm focus:ring-2 focus:ring-teal-600 focus:outline-none transition" placeholder="Cari model (mis. PS5)" type="search" />
+        </form>
+        <span class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-white border border-slate-100 text-xs font-semibold text-slate-700 shadow-sm whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>{{if .User}}{{.User.Branch}}{{end}}
+        </span>
+      </div>
+      <div class="flex items-center space-x-3 self-end md:self-auto">
+        <div class="hidden sm:flex items-center px-4 py-2 rounded-2xl bg-white border border-slate-100 text-xs font-semibold text-teal-700 shadow-sm whitespace-nowrap">{{.Today}}</div>
+        {{if or (eq .User.Role "owner") (eq .User.Role "manajer")}}
+        <a href="/persetujuan" class="relative w-10 h-10 rounded-2xl bg-white border border-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center shadow-sm hover:shadow transition" title="Persetujuan menunggu">
+          <svg class="w-4 h-4 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          {{if gt .Pending 0}}<span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>{{end}}
+        </a>
+        {{end}}
+        <a href="/akun" class="flex items-center gap-2 rounded-xl hover:bg-slate-100 p-1 pr-2 transition-colors" title="Akun saya">
+          <div class="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-slate-200 bg-slate-800 flex items-center justify-center text-white font-semibold text-sm"><span>{{initials .User.Name}}</span></div>
+          <div class="hidden lg:block leading-tight">
+            <p class="text-xs font-semibold text-slate-900">{{.User.Name}}</p>
+            <p class="text-xs font-semibold text-slate-500 capitalize">{{.User.Role}}</p>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    {{if .Message}}<div class="rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-sm font-semibold text-emerald-700">{{.Message}}</div>{{end}}
+    {{if .Error}}<div class="rounded-2xl bg-rose-50 border border-rose-100 px-4 py-3 text-sm font-semibold text-rose-700">{{.Error}}</div>{{end}}
+
+    {{template "content" .}}
+  </main>
+</body>
+</html>
+{{end}}

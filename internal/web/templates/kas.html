@@ -1,0 +1,177 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Kas harian</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Buka, catat mutasi, lalu tutup kas cabang.</p>
+  </div>
+  <div class="flex items-center gap-2">
+    {{if .Data.IsOwner}}
+    <form method="get" action="/kas" class="flex items-center gap-2">
+      <select name="branch" class="rounded-2xl border-slate-200 bg-white text-xs font-semibold text-slate-700 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+        {{range .Data.Branches}}<option value="{{.ID}}" {{if eq .ID $.Data.BranchID}}selected{{end}}>{{.Name}}</option>{{end}}
+      </select>
+      <button type="submit" class="px-3 py-2 rounded-2xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Lihat</button>
+    </form>
+    {{end}}
+    <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white border border-slate-100 text-xs font-semibold text-slate-700 shadow-sm">
+      <span class="w-1.5 h-1.5 rounded-full {{if .Data.Session}}{{if eq .Data.Session.Status "menunggu"}}bg-amber-500{{else}}bg-emerald-500{{end}}{{else}}bg-slate-300{{end}}"></span>
+      {{if .Data.Session}}{{if eq .Data.Session.Status "menunggu"}}menunggu persetujuan{{else}}kas terbuka{{end}}{{else}}kas belum dibuka{{end}}
+    </span>
+    <a href="/persetujuan" class="inline-flex items-center px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition">Persetujuan</a>
+  </div>
+</section>
+
+{{if not .Data.Session}}
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+    <h2 class="text-base font-semibold text-slate-900">Buka kas</h2>
+    <p class="text-xs text-slate-500 font-medium mt-0.5">Catat saldo awal tunai di laci.</p>
+    <form method="post" action="/kas/buka" class="mt-5 space-y-4">
+      <input type="hidden" name="branch" value="{{.Data.BranchID}}" />
+      <div>
+        <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="opening">Saldo awal tunai</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-xs font-semibold text-slate-500 pointer-events-none">Rp</span>
+          <input id="opening" name="opening" inputmode="numeric" placeholder="2.000.000" required class="w-full rounded-2xl border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-base font-semibold focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+      </div>
+      <button type="submit" class="w-full py-3 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 shadow-md">Buka kas</button>
+    </form>
+  </div>
+  <div class="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+    <h2 class="text-sm font-semibold text-slate-900">Cara kerja</h2>
+    <ul class="mt-3 space-y-2 text-xs font-medium text-slate-500 list-disc list-inside">
+      <li>Penjualan dan pembelian tunai otomatis masuk kas.</li>
+      <li>Tutup kas menghitung saldo sistem vs hitung fisik.</li>
+      <li>Selisih di atas {{rp .Data.Threshold}} butuh persetujuan manajer.</li>
+      <li>Kas yang sudah ditutup tidak bisa diubah.</li>
+    </ul>
+  </div>
+</section>
+{{else}}
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+  <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+    <p class="text-xs font-semibold text-slate-500">Saldo awal</p>
+    <p class="text-xl font-semibold text-slate-900 tracking-tight mt-2">{{rp .Data.Session.Opening}}</p>
+    <p class="text-xs text-slate-500 font-medium mt-1">{{.Data.Session.OpenedBy}} · {{.Data.Session.OpenedAt.Format "02 Jan 15:04"}}</p>
+  </div>
+  <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+    <p class="text-xs font-semibold text-slate-500">Uang masuk (tunai)</p>
+    <p class="text-xl font-semibold text-emerald-600 tracking-tight mt-2">{{rp .Data.In}}</p>
+    <p class="text-xs text-slate-500 font-medium mt-1">penjualan + mutasi masuk</p>
+  </div>
+  <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+    <p class="text-xs font-semibold text-slate-500">Uang keluar (tunai)</p>
+    <p class="text-xl font-semibold text-rose-500 tracking-tight mt-2">{{rp .Data.Out}}</p>
+    <p class="text-xs text-slate-500 font-medium mt-1">pembelian + pengeluaran</p>
+  </div>
+  <div class="bg-teal-700 rounded-3xl p-5 text-white shadow-sm">
+    <p class="text-xs font-semibold text-teal-100">Saldo sistem</p>
+    <p class="text-2xl font-medium tracking-tight mt-2">{{rp .Data.Expected}}</p>
+    <p class="text-xs text-teal-200 font-medium mt-1">saldo awal + masuk − keluar</p>
+  </div>
+</section>
+
+{{if eq .Data.Session.Status "menunggu"}}
+<div class="rounded-2xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm font-semibold text-amber-700">
+  Kas sudah dihitung dan menunggu persetujuan: sistem {{rp .Data.Session.Expected}}, fisik {{rp .Data.Session.Counted}}, selisih {{signedDiff .Data.Session.Counted .Data.Session.Expected}}.
+</div>
+{{end}}
+
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="lg:col-span-7 xl:col-span-8 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between p-5 border-b border-slate-100">
+      <h2 class="text-sm font-semibold text-slate-900">Mutasi sesi ini</h2>
+      <span class="text-xs font-semibold text-slate-500">{{len .Data.Movements}} baris</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="bg-slate-50/50 text-xs font-semibold text-slate-500">
+            <th scope="col" class="py-3 pl-6 pr-3">Waktu</th>
+            <th scope="col" class="py-3 px-3">Jenis</th>
+            <th scope="col" class="py-3 px-3">Metode</th>
+            <th scope="col" class="py-3 px-3">Keterangan</th>
+            <th scope="col" class="py-3 pr-6 pl-3 text-right">Nominal</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+          {{range .Data.Movements}}
+          <tr class="hover:bg-slate-50/60 transition">
+            <td class="py-3.5 pl-6 pr-3 text-slate-500">{{.CreatedAt.Format "15:04"}}</td>
+            <td class="py-3.5 px-3"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold {{if or (eq .Kind "sale") (eq .Kind "in")}}bg-emerald-50 text-emerald-700{{else}}bg-rose-50 text-rose-700{{end}}">{{.Kind}}</span></td>
+            <td class="py-3.5 px-3 text-slate-600">{{methodLabel .Method}}</td>
+            <td class="py-3.5 px-3 text-slate-600">{{.Note}}</td>
+            <td class="py-3.5 pr-6 pl-3 text-right font-semibold {{if or (eq .Kind "sale") (eq .Kind "in")}}text-emerald-600{{else}}text-rose-500{{end}}">{{if or (eq .Kind "sale") (eq .Kind "in")}}+{{else}}−{{end}} {{rp .Amount}}</td>
+          </tr>
+          {{else}}
+          <tr><td colspan="5" class="py-8 text-center text-slate-500 font-medium">Belum ada mutasi.</td></tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="lg:col-span-5 xl:col-span-4 space-y-6">
+    {{if eq .Data.Session.Status "buka"}}
+    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+      <h2 class="text-base font-semibold text-slate-900">Catat pengeluaran</h2>
+      <form method="post" action="/kas/movement" class="mt-4 space-y-3">
+        <input type="hidden" name="branch" value="{{.Data.BranchID}}" />
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="kind">Jenis</label>
+            <select id="kind" name="kind" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500">
+              <option value="expense">Pengeluaran</option>
+              <option value="out">Kas keluar lain</option>
+              <option value="in">Kas masuk lain</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="metode">Metode</label>
+            <select id="metode" name="method" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500">
+              <option value="tunai">Tunai</option>
+              <option value="transfer">Transfer</option>
+              <option value="qris">QRIS</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="amount">Nominal</label>
+          <input id="amount" name="amount" inputmode="numeric" placeholder="175.000" required class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="note">Keterangan</label>
+          <input id="note" name="note" placeholder="Bensin, makan, ongkir" required class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium placeholder-slate-400 focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <button type="submit" class="w-full py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">Simpan mutasi</button>
+      </form>
+    </div>
+
+    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+      <h2 class="text-base font-semibold text-slate-900">Tutup kas</h2>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">Saldo sistem {{rp .Data.Expected}}.</p>
+      <form method="post" action="/kas/tutup" class="mt-4 space-y-3">
+        <input type="hidden" name="branch" value="{{.Data.BranchID}}" />
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="counted">Uang fisik dihitung</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-xs font-semibold text-slate-500 pointer-events-none">Rp</span>
+            <input id="counted" name="counted" inputmode="numeric" placeholder="{{num .Data.Expected}}" required class="w-full rounded-2xl border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-base font-semibold focus:border-teal-500 focus:ring-teal-500" />
+          </div>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 shadow-md">Tutup kas</button>
+        <p class="text-xs text-slate-500 font-medium">Selisih di atas {{rp .Data.Threshold}} masuk antrean persetujuan.</p>
+      </form>
+    </div>
+    {{else}}
+    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+      <h2 class="text-sm font-semibold text-slate-900">Menunggu persetujuan</h2>
+      <p class="text-xs text-slate-500 font-medium mt-2">Kas terkunci sampai manajer memutuskan. Setelah disetujui, sesi ditutup permanen.</p>
+      <a href="/persetujuan" class="inline-flex mt-4 px-4 py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">Buka persetujuan</a>
+    </div>
+    {{end}}
+  </div>
+</section>
+{{end}}
+{{end}}

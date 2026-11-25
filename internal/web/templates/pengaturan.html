@@ -1,0 +1,94 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Pengaturan</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Semua angka rumus harga dan ambang persetujuan.</p>
+  </div>
+  <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white border border-slate-100 text-xs font-semibold text-slate-600 shadow-sm">Hanya Owner</span>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <form method="post" action="/pengaturan" class="lg:col-span-7 space-y-6">
+    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+      <h2 class="text-base font-semibold text-slate-900">Margin</h2>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">Target margin per kategori dan batas kasir.</p>
+      <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {{range .Data.Cats}}
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="margin-{{.Name}}">{{.Name}} (%)</label>
+          <input id="margin-{{.Name}}" name="margin_{{.Name}}" value="{{.Value}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        {{end}}
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="min-margin">Minimal (%)</label>
+          <input id="min-margin" name="min_margin" value="{{.Data.MinMargin}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+      </div>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="est-cost">Estimasi biaya per unit</label>
+          <input id="est-cost" name="est_cost" value="{{num .Data.Settings.EstCost}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="cash-threshold">Ambang selisih kas</label>
+          <input id="cash-threshold" name="cash_threshold" value="{{num .Data.Settings.CashThreshold}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+      <h2 class="text-base font-semibold text-slate-900">Data &amp; bobot</h2>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">Periode data, peluruhan umur, dan bobot sumber.</p>
+      <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="period">Periode (hari)</label>
+          <input id="period" name="period_days" value="{{.Data.Settings.PeriodDays}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="halflife">Umur paruh (hari)</label>
+          <input id="halflife" name="half_life_days" value="{{.Data.HalfLife}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="w-toko">Bobot toko</label>
+          <input id="w-toko" name="w_toko" value="{{.Data.WeightToko}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="w-pesaing">Bobot pesaing</label>
+          <input id="w-pesaing" name="w_pesaing" value="{{.Data.WeightPesaing}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="w-marketplace">Bobot marketplace</label>
+          <input id="w-marketplace" name="w_marketplace" value="{{.Data.WeightMarketplace}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 mb-1.5 block" for="w-penjual">Bobot penjual</label>
+          <input id="w-penjual" name="w_penjual" value="{{.Data.WeightPenjual}}" class="w-full rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+        </div>
+      </div>
+      <p class="text-xs text-slate-500 font-medium mt-4">Perubahan langsung dipakai perhitungan berikutnya dan tercatat di audit log.</p>
+    </div>
+
+    <button type="submit" class="w-full py-3.5 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800  transition active:scale-[.99]">Simpan pengaturan</button>
+  </form>
+
+  <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden self-start">
+    <div class="p-6 pb-4">
+      <h2 class="text-base font-semibold text-slate-900">Audit log</h2>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">20 perubahan terakhir.</p>
+    </div>
+    <div class="divide-y divide-slate-100">
+      {{range .Data.Audit}}
+      <div class="px-6 py-3">
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs font-semibold text-slate-900">{{.Action}} · {{.Entity}}</p>
+          <span class="text-xs font-semibold text-slate-500 whitespace-nowrap">{{.CreatedAt.Format "02 Jan 15:04"}}</span>
+        </div>
+        <p class="text-xs font-medium text-slate-500 mt-0.5">{{.UserName}}{{if .OldValue}} · {{.OldValue}} → {{.NewValue}}{{end}}</p>
+      </div>
+      {{else}}
+      <p class="px-6 py-8 text-xs text-slate-500 font-medium">Belum ada perubahan.</p>
+      {{end}}
+    </div>
+  </div>
+</section>
+{{end}}

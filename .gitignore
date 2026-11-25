@@ -1,0 +1,16 @@
+# Artefak QA lokal
+.taste-skill/
+
+# Data runtime
+data/uploads/
+tmp-*.csv
+*.log
+
+# Build
+*.exe
+prediksi
+prediksi.exe
+
+# Rahasia lokal
+.env
+.env.*

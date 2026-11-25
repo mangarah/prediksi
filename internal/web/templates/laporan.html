@@ -1,0 +1,85 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Laporan</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Laba, omzet, dan kinerja per periode.</p>
+  </div>
+  <div class="flex flex-wrap items-center gap-2">
+    <a href="/laporan/export?from={{.Data.From}}&to={{.Data.To}}" class="inline-flex items-center px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Ekspor CSV</a>
+    <a href="/opname" class="inline-flex items-center px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Stok opname</a>
+    <a href="/impor" class="inline-flex items-center px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Impor data</a>
+  </div>
+</section>
+
+<form method="get" action="/laporan" class="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm flex flex-col sm:flex-row sm:items-end gap-3">
+  <div>
+    <label class="text-xs font-semibold text-slate-500 mb-1 block" for="from">Dari</label>
+    <input id="from" name="from" type="date" value="{{.Data.From}}" class="rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+  </div>
+  <div>
+    <label class="text-xs font-semibold text-slate-500 mb-1 block" for="to">Sampai</label>
+    <input id="to" name="to" type="date" value="{{.Data.To}}" class="rounded-2xl border-slate-200 bg-slate-50 text-sm font-medium focus:border-teal-500 focus:ring-teal-500" />
+  </div>
+  <button class="px-4 py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">Tampilkan</button>
+</form>
+
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+  <div class="bg-teal-700 rounded-3xl p-5 text-white shadow-sm">
+    <p class="text-xs font-semibold text-teal-100">Laba</p>
+    <p class="text-2xl font-medium tracking-tight mt-2">{{rp .Data.Rep.Profit}}</p>
+    <p class="text-xs text-teal-200 font-medium mt-1">margin {{.Data.Rep.MarginPct}}% dari omzet</p>
+  </div>
+  <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+    <p class="text-xs font-semibold text-slate-500">Omzet</p>
+    <p class="text-2xl font-medium tracking-tight mt-2">{{rp .Data.Rep.Revenue}}</p>
+    <p class="text-xs text-slate-500 font-medium mt-1">{{.Data.Rep.Units}} unit terjual</p>
+  </div>
+  <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+    <p class="text-xs font-semibold text-slate-500">Nilai stok aktif</p>
+    <p class="text-2xl font-medium tracking-tight mt-2">{{rp .Data.Rep.StockValue}}</p>
+    <p class="text-xs text-slate-500 font-medium mt-1">modal unit belum laku</p>
+  </div>
+  <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+    <p class="text-xs font-semibold text-slate-500">Stok mengendap</p>
+    <p class="text-2xl font-medium tracking-tight mt-2">{{.Data.Rep.Stale}} unit</p>
+    <p class="text-xs text-slate-500 font-medium mt-1">lebih dari 30 hari</p>
+  </div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <h2 class="text-sm font-semibold text-slate-900 p-5 pb-3">Laba per hari</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead><tr class="border-y border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500">
+          <th scope="col" class="py-3 pl-6 pr-3">Tanggal</th><th scope="col" class="py-3 px-3">Unit</th><th scope="col" class="py-3 px-3">Omzet</th><th scope="col" class="py-3 pr-6 pl-3 text-right">Laba</th>
+        </tr></thead>
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+          {{range .Data.Rep.Days}}
+          <tr><td class="py-3 pl-6 pr-3 text-slate-600">{{.Label}}</td><td class="py-3 px-3">{{.Units}}</td><td class="py-3 px-3">{{rp .Revenue}}</td><td class="py-3 pr-6 pl-3 text-right font-semibold text-slate-900">{{rp .Profit}}</td></tr>
+          {{else}}<tr><td colspan="4" class="py-8 text-center text-slate-500 font-medium">Tidak ada penjualan.</td></tr>{{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="lg:col-span-5 space-y-6">
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <h2 class="text-sm font-semibold text-slate-900 p-5 pb-3">Per kategori</h2>
+      <div class="divide-y divide-slate-100">
+        {{range .Data.Rep.Cats}}
+        <div class="px-5 py-3 flex items-center justify-between text-xs"><div><p class="font-semibold text-slate-900">{{.Name}}</p><p class="text-xs text-slate-500">{{.Units}} unit</p></div><span class="font-semibold text-slate-900">{{rp .Profit}}</span></div>
+        {{else}}<p class="px-5 py-6 text-xs text-slate-500 font-medium">Belum ada data.</p>{{end}}
+      </div>
+    </div>
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+      <h2 class="text-sm font-semibold text-slate-900 p-5 pb-3">Per kasir</h2>
+      <div class="divide-y divide-slate-100">
+        {{range .Data.Rep.Staff}}
+        <div class="px-5 py-3 flex items-center justify-between text-xs"><div><p class="font-semibold text-slate-900">{{.Name}}</p><p class="text-xs text-slate-500">{{.Units}} unit · {{rp .Revenue}}</p></div><span class="font-semibold text-slate-900">{{rp .Profit}}</span></div>
+        {{else}}<p class="px-5 py-6 text-xs text-slate-500 font-medium">Belum ada data.</p>{{end}}
+      </div>
+    </div>
+  </div>
+</section>
+{{end}}

@@ -1,0 +1,108 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Unit {{.Data.Unit.Code}}</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">{{.Data.Unit.Model}} {{.Data.Unit.Variant}} · Grade {{.Data.Unit.Grade}} · {{.Data.Unit.Branch}}</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <a href="/label/{{.Data.Unit.ID}}" target="_blank" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors">Label</a>
+    {{if eq .Data.Unit.Status "siap"}}<a href="/kasir?unit={{.Data.Unit.ID}}" class="px-4 py-2 rounded-xl bg-teal-700 text-white text-xs font-semibold hover:bg-teal-800 transition-colors">Jual unit</a>{{end}}
+  </div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 space-y-6">
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-slate-900 mb-4">Identitas</h2>
+      <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4 text-sm">
+        <div><dt class="text-xs text-slate-500">Status</dt><dd class="mt-1"><span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold {{statusPill .Data.Unit.Status}}">{{statusLabel .Data.Unit.Status}}</span></dd></div>
+        <div><dt class="text-xs text-slate-500">Kategori</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Unit.Category}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Nomor seri</dt><dd class="mt-1 font-medium text-slate-800">{{if .Data.Unit.Serial}}{{.Data.Unit.Serial}}{{else}}—{{end}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Umur stok</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Unit.AgeDays}} hari</dd></div>
+        <div><dt class="text-xs text-slate-500">Cabang</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Unit.Branch}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Masuk</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Unit.CreatedAt.Format "02 Jan 2006"}}</dd></div>
+      </dl>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-slate-900 mb-4">Pembelian</h2>
+      {{if .Data.Purchase.Seller}}
+      <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4 text-sm">
+        <div><dt class="text-xs text-slate-500">Penjual</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Purchase.Seller}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Telepon</dt><dd class="mt-1 font-medium text-slate-800">{{if .Data.Purchase.Phone}}{{.Data.Purchase.Phone}}{{else}}—{{end}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Tanggal</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Purchase.Date}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Harga deal</dt><dd class="mt-1 font-medium text-slate-800">{{rp .Data.Purchase.Deal}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Biaya</dt><dd class="mt-1 font-medium text-slate-800">{{rp .Data.Purchase.EstCost}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Status</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Purchase.Status}}</dd></div>
+      </dl>
+      {{if .Data.Unit.Photo}}<img src="/uploads/{{.Data.Unit.Photo}}" alt="Foto {{.Data.Unit.Model}}" class="mt-4 w-full max-w-sm rounded-xl border border-slate-100" />{{end}}
+      {{else}}
+      <p class="text-sm text-slate-500">Unit ini masuk lewat impor, tanpa data pembelian.</p>
+      {{end}}
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-slate-900 mb-4">Penjualan</h2>
+      {{if .Data.HasSale}}
+      <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4 text-sm">
+        <div><dt class="text-xs text-slate-500">Nota</dt><dd class="mt-1"><a href="/nota/{{.Data.Sale.ID}}" class="font-semibold text-teal-700 hover:text-teal-800">{{.Data.Sale.Invoice}}</a></dd></div>
+        <div><dt class="text-xs text-slate-500">Tanggal</dt><dd class="mt-1 font-medium text-slate-800">{{.Data.Sale.Date}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Pembeli</dt><dd class="mt-1 font-medium text-slate-800">{{if .Data.Sale.Buyer}}{{.Data.Sale.Buyer}}{{else}}—{{end}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Total</dt><dd class="mt-1 font-medium text-slate-800">{{rp .Data.Sale.Total}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Laba</dt><dd class="mt-1 font-medium text-slate-800">{{rp .Data.Sale.Profit}}</dd></div>
+        <div><dt class="text-xs text-slate-500">Metode</dt><dd class="mt-1 font-medium text-slate-800">{{methodLabel .Data.Sale.Method}}</dd></div>
+      </dl>
+      {{if .Data.Sale.Voided}}<p class="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">Dibatalkan: {{.Data.Sale.VoidReason}}</p>{{end}}
+      {{else}}
+      <p class="text-sm text-slate-500">Belum terjual.</p>
+      {{end}}
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-slate-900 mb-4">Riwayat</h2>
+      {{if .Data.Transfers}}
+      <div class="space-y-3 mb-5">
+        {{range .Data.Transfers}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-sm border-b border-slate-100 pb-3">
+          <span class="font-medium text-slate-800">{{.From}} → {{.To}}</span>
+          <span class="text-xs text-slate-500">{{.Date}} · {{.SentBy}}{{if .ReceivedBy}} → {{.ReceivedBy}}{{end}} · {{.Status}}</span>
+        </div>
+        {{end}}
+      </div>
+      {{end}}
+      {{if .Data.Audit}}
+      <ul class="space-y-2 text-xs text-slate-600">
+        {{range .Data.Audit}}
+        <li><span class="font-semibold text-slate-800">{{.Action}}</span> · {{.UserName}} · {{.CreatedAt.Format "02 Jan 15:04"}}{{if .NewValue}} · {{.NewValue}}{{end}}</li>
+        {{end}}
+      </ul>
+      {{else if not .Data.Transfers}}
+      <p class="text-sm text-slate-500">Belum ada riwayat.</p>
+      {{end}}
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+      <h2 class="text-base font-semibold text-slate-900 mb-4">Harga</h2>
+      <dl class="space-y-3 text-sm">
+        <div class="flex items-center justify-between"><dt class="text-slate-500">Modal</dt><dd class="font-medium text-slate-900">{{rp .Data.Unit.Cost}}</dd></div>
+        <div class="flex items-center justify-between"><dt class="text-slate-500">Harga jual</dt><dd class="font-semibold text-slate-900">{{rp .Data.Unit.ListedPrice}}</dd></div>
+        <div class="flex items-center justify-between"><dt class="text-slate-500">Harga minimal</dt><dd class="font-medium text-slate-900">{{rp .Data.Unit.MinPrice}}</dd></div>
+      </dl>
+      {{if gt .Data.Suggested 0}}
+      <p class="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-xs font-medium text-amber-700">Stok {{.Data.Unit.AgeDays}} hari. Saran turun harga: <span class="font-bold">{{rp .Data.Suggested}}</span> (tidak di bawah harga minimal).</p>
+      {{end}}
+    </div>
+
+    {{if and (or (eq .User.Role "owner") (eq .User.Role "manajer")) (ne .Data.Unit.Status "terjual") (ne .Data.Unit.Status "kirim")}}
+    <form method="post" action="/unit/{{.Data.Unit.ID}}/harga" class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-3">
+      <h2 class="text-base font-semibold text-slate-900">Ubah harga jual</h2>
+      <input name="price" inputmode="numeric" required value="{{num .Data.Unit.ListedPrice}}" class="w-full rounded-xl border-slate-200 bg-slate-50 text-sm font-semibold" />
+      <p class="text-xs text-slate-500">Tidak boleh di bawah harga minimal {{rp .Data.Unit.MinPrice}}.</p>
+      <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors">Simpan harga</button>
+    </form>
+    {{end}}
+  </div>
+</section>
+{{end}}

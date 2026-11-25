@@ -1,0 +1,87 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Prediksi &amp; saran beli</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Skor permintaan dari kecepatan laku dan volume 30 hari.</p>
+  </div>
+  <a href="/pembelian" class="inline-flex items-center px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Catat pembelian</a>
+</section>
+
+{{if .Data.Top}}
+<section class="space-y-4">
+  <h2 class="text-2xl font-medium tracking-tight text-slate-900">Cari barang ini</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    {{range .Data.Top}}
+    <div class="bg-white rounded-3xl p-5 border border-teal-100 shadow-sm relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-teal-500"></div>
+      <div class="flex items-center justify-between">
+        <span class="inline-flex px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">skor {{.Score}}</span>
+        <span class="text-xs font-semibold text-slate-500">butuh {{.Need}} unit</span>
+      </div>
+      <h3 class="text-sm font-semibold text-slate-900 mt-3">{{.Model}} {{.Variant}}</h3>
+      <p class="text-xs font-medium text-slate-500">{{.Category}} · rata-rata {{printf "%.1f" .Weekly}} unit/minggu · stok {{.Stock}}</p>
+      <p class="text-xs font-medium text-slate-500 mt-1">Perkiraan 4 minggu: {{.Forecast4}} unit ({{.Low4}}–{{.High4}})</p>
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <div><p class="text-xs font-semibold text-slate-500">Batas beli</p><p class="text-sm font-semibold text-amber-600">{{rp .BuyLimit}}</p></div>
+        <div><p class="text-xs font-semibold text-slate-500">Jual</p><p class="text-sm font-semibold text-slate-900">{{rp .Recommended}}</p></div>
+      </div>
+    </div>
+    {{end}}
+  </div>
+</section>
+{{else}}
+<div class="rounded-2xl bg-white border border-slate-100 shadow-sm px-5 py-4 text-xs font-medium text-slate-500">Belum ada model dengan skor ≥ 70 dan kebutuhan stok. Skor dihitung ulang tiap halaman dibuka.</div>
+{{end}}
+
+<section class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+  <div class="flex items-center justify-between p-6 pb-4">
+    <div>
+      <h2 class="text-base font-semibold text-slate-900">Skor permintaan</h2>
+      <p class="text-xs text-slate-500 font-medium mt-0.5">Bobot 35% kecepatan laku · 25% volume (dinormalkan)</p>
+    </div>
+    <span class="text-xs font-semibold text-slate-500">{{len .Data.Rows}} model</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-xs">
+      <thead>
+        <tr class="border-y border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500">
+          <th scope="col" class="py-3 pl-6 pr-3">Model</th>
+          <th scope="col" class="py-3 px-3">Terjual 30h</th>
+          <th scope="col" class="py-3 px-3">Median laku</th>
+          <th scope="col" class="py-3 px-3">Stok</th>
+          <th scope="col" class="py-3 px-3">Kebutuhan</th>
+          <th scope="col" class="py-3 px-3">Skor</th>
+          <th scope="col" class="py-3 px-3">Kategori</th>
+          <th scope="col" class="py-3 pr-6 pl-3 text-right">Batas beli</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+        {{range .Data.Rows}}
+        <tr class="hover:bg-slate-50/60 transition">
+          <td class="py-3.5 pl-6 pr-3">
+            <div class="font-semibold text-slate-900">{{.Model}} {{.Variant}}</div>
+            <div class="text-xs text-slate-500">{{.Category}}</div>
+          </td>
+          <td class="py-3.5 px-3">{{.Sold30}}</td>
+          <td class="py-3.5 px-3">{{printf "%.0f" .MedianDays}} hari</td>
+          <td class="py-3.5 px-3">{{.Stock}}</td>
+          <td class="py-3.5 px-3 font-semibold {{if gt .Need 0}}text-teal-700{{else}}text-slate-500{{end}}">{{.Need}}</td>
+          <td class="py-3.5 px-3">
+            <div class="flex items-center gap-2">
+              <div class="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full rounded-full {{if ge .Score 70}}bg-emerald-500{{else if ge .Score 40}}bg-amber-400{{else}}bg-rose-400{{end}}" style="width: {{.Score}}%"></div></div>
+              <span class="font-semibold text-slate-900">{{.Score}}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-3">
+            <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold {{if ge .Score 70}}bg-emerald-50 text-emerald-700{{else if ge .Score 40}}bg-amber-50 text-amber-700{{else}}bg-rose-50 text-rose-700{{end}}">{{.Label}}</span>
+          </td>
+          <td class="py-3.5 pr-6 pl-3 text-right font-semibold text-slate-900">{{if .HasQuote}}{{rp .BuyLimit}}{{else}}—{{end}}</td>
+        </tr>
+        {{else}}
+        <tr><td colspan="8" class="py-10 text-center text-slate-500 font-medium">Belum ada penjualan untuk dihitung.</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+{{end}}

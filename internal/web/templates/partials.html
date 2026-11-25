@@ -1,0 +1,215 @@
+{{define "quote_result"}}
+{{if not .Q.Count}}
+<div class="bg-white rounded-3xl p-10 border border-slate-100 shadow-sm text-center">
+  <p class="text-sm font-semibold text-slate-900">Data pembanding belum cukup</p>
+  <p class="text-xs text-slate-500 font-medium mt-2">Belum ada harga untuk {{.Selected.Name}} {{.Selected.Variant}} dalam {{.PeriodDays}} hari terakhir. Pembelian tetap bisa dicatat, tapi akan masuk antrean persetujuan.</p>
+  <a href="/pembelian" class="inline-flex mt-5 px-4 py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800">Catat pembelian</a>
+</div>
+{{else}}
+<div class="space-y-6">
+  <div class="bg-teal-700 rounded-3xl p-6 sm:p-7 text-white shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-semibold text-teal-200">{{.Selected.Name}} · {{.Selected.Variant}} · Grade {{.Grade}}{{if .FullSet}} · Lengkap{{end}}</p>
+        <p class="text-4xl font-medium tracking-tight mt-2">{{rp .Q.Market}}</p>
+        <p class="text-sm text-teal-100 font-medium mt-1">Harga pasar jual</p>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full {{if .Q.LowData}}bg-amber-300/20 text-amber-100{{else}}bg-white/15 text-white{{end}} text-xs font-semibold self-start whitespace-nowrap">
+        {{if .Q.LowData}}Data kurang · perlu persetujuan{{else}}{{.Q.Count}} data · cukup{{end}}
+      </span>
+    </div>
+    <div class="mt-6">
+      <div class="flex items-center justify-between text-xs font-semibold text-teal-200 mb-1.5">
+        <span>P25 {{rp .Q.P25}}</span>
+        <span>P75 {{rp .Q.P75}}</span>
+      </div>
+      <div class="h-2 rounded-full bg-white/20 relative">
+        <div class="absolute inset-y-0 left-[18%] right-[22%] rounded-full bg-white/80"></div>
+        <div class="absolute -top-1 left-1/2 w-4 h-4 rounded-full bg-white ring-4 ring-white/30 -translate-x-1/2"></div>
+      </div>
+      <p class="text-xs text-teal-200 font-medium mt-3">Median berbobot · target margin {{.TargetPct}}% · {{.Q.Count}} data dipakai, {{len .Q.Outliers}} outlier dibuang</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+      <p class="text-xs font-semibold text-slate-500">Batas beli maksimal</p>
+      <p class="text-xl font-semibold text-slate-900 tracking-tight mt-1">{{rp .Q.BuyLimit}}</p>
+      <p class="text-xs text-slate-500 font-medium mt-1">Margin {{.TargetPct}}% + estimasi biaya {{rp .EstCost}}</p>
+    </div>
+    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+      <p class="text-xs font-semibold text-slate-500">Harga jual rekomendasi</p>
+      <p class="text-xl font-semibold text-slate-900 tracking-tight mt-1">{{rp .Q.Recommended}}</p>
+      <p class="text-xs text-slate-500 font-medium mt-1">Dibulatkan ke atas per Rp 10.000</p>
+    </div>
+    <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+      <p class="text-xs font-semibold text-slate-500">{{if gt .Deal 0}}Harga minimal kasir{{else}}Rentang pasar{{end}}</p>
+      <p class="text-xl font-semibold text-slate-900 tracking-tight mt-1">{{if gt .Deal 0}}{{rp .Q.MinPrice}}{{else}}{{rp .Q.P25}} – {{rp .Q.P75}}{{end}}</p>
+      <p class="text-xs text-slate-500 font-medium mt-1">{{if gt .Deal 0}}Modal {{rp .ModalCost}} · margin min 5%{{else}}P25 sampai P75{{end}}</p>
+    </div>
+  </div>
+
+  {{if gt .Deal 0}}
+  <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500">Jika dibeli di {{rp .Deal}}{{if le .Deal .Q.BuyLimit}} · <span class="text-emerald-600">aman</span>{{else}} · <span class="text-rose-500">di atas batas</span>{{end}}</p>
+          <p class="text-xl font-semibold text-slate-900 tracking-tight">Laba {{rp .Q.Profit}} <span class="text-sm font-semibold {{if gt .Q.Profit 0}}text-emerald-600{{else}}text-rose-500{{end}}">{{profitPct .Q.Profit .ModalCost}}%</span></p>
+        </div>
+      </div>
+      <div class="flex items-center gap-6 text-right">
+        <div><p class="text-xs font-semibold text-slate-500">Harga pasar</p><p class="text-sm font-semibold text-slate-800">{{rp .Q.Market}}</p></div>
+        <div><p class="text-xs font-semibold text-slate-500">Batas beli</p><p class="text-sm font-semibold text-slate-800">{{rp .Q.BuyLimit}}</p></div>
+        <div><p class="text-xs font-semibold text-slate-500">Modal</p><p class="text-sm font-semibold text-slate-800">{{rp .ModalCost}}</p></div>
+      </div>
+    </div>
+  </div>
+  {{end}}
+
+  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between p-6 pb-4">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">Data pembanding</h2>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">{{.Q.Count}} dipakai · {{len .Q.Outliers}} outlier · {{.PeriodDays}} hari terakhir</p>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="border-y border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500">
+            <th scope="col" class="py-3 pl-6 pr-3">Sumber</th>
+            <th scope="col" class="py-3 px-3">Harga</th>
+            <th scope="col" class="py-3 px-3">Grade</th>
+            <th scope="col" class="py-3 px-3">Tanggal</th>
+            <th scope="col" class="py-3 px-3">Bobot</th>
+            <th scope="col" class="py-3 pr-6 pl-3 text-right">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+          {{range .Observations}}
+          <tr class="hover:bg-slate-50/60 transition">
+            <td class="py-3.5 pl-6 pr-3 font-semibold text-slate-900">{{.SourceLabel}}</td>
+            <td class="py-3.5 px-3 font-semibold {{if .Outlier}}text-slate-900 line-through decoration-rose-400/60{{else}}text-slate-900{{end}}">{{rp .Price}}</td>
+            <td class="py-3.5 px-3 text-slate-600">{{.Grade}}</td>
+            <td class="py-3.5 px-3 text-slate-500">{{.Date}}</td>
+            <td class="py-3.5 px-3 text-slate-600">{{.Weight}}</td>
+            <td class="py-3.5 pr-6 pl-3 text-right">{{if .Outlier}}<span class="inline-flex px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold">outlier</span>{{else if .Buy}}<span class="inline-flex px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">harga beli</span>{{else}}<span class="inline-flex px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">dipakai</span>{{end}}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-100">
+      <p class="text-xs text-slate-500 font-medium">Outlier tetap disimpan, tidak dipakai menghitung. Bobot = sumber × 0,5<sup>umur/30</sup>.</p>
+    </div>
+  </div>
+</div>
+{{end}}
+{{end}}
+
+{{define "ringkasan"}}
+<div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm lg:sticky lg:top-6" id="ringkasan">
+  <h2 class="text-base font-semibold text-slate-900">Ringkasan</h2>
+  <dl class="mt-5 space-y-3 text-sm">
+    <div class="flex items-center justify-between">
+      <dt class="text-slate-500 font-medium">Harga</dt>
+      <dd class="font-semibold text-slate-900">{{rp .Price}}</dd>
+    </div>
+    <div class="flex items-center justify-between">
+      <dt class="text-slate-500 font-medium">Diskon</dt>
+      <dd class="font-semibold text-slate-900">{{rp .Discount}}</dd>
+    </div>
+    <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+      <dt class="text-sm font-semibold text-slate-900">Total</dt>
+      <dd class="text-2xl font-medium tracking-tight text-slate-900">{{rp .Total}}</dd>
+    </div>
+  </dl>
+
+  {{if .ShowProfit}}
+  <div class="mt-5 rounded-2xl {{if .BelowMin}}bg-rose-50{{else}}bg-emerald-50{{end}} p-4">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-semibold {{if .BelowMin}}text-rose-700{{else}}text-emerald-700{{end}}">{{if .BelowMin}}Di bawah harga minimal{{else}}Laba unit{{end}}</span>
+      <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{if .BelowMin}}bg-rose-100 text-rose-700{{else}}bg-emerald-100 text-emerald-700{{end}}">{{.MarginPct}}%</span>
+    </div>
+    <p class="text-xl font-semibold {{if .BelowMin}}text-rose-700{{else}}text-emerald-700{{end}} tracking-tight mt-1">{{rp .Profit}}</p>
+    <p class="text-xs {{if .BelowMin}}text-rose-600/80{{else}}text-emerald-600/80{{end}} font-medium mt-0.5">{{if .BelowMin}}Turunkan harga atau minta persetujuan manajer.{{else}}Harga jual − modal {{rp .Cost}}{{end}}</p>
+  </div>
+  {{else}}
+  <div class="mt-5 rounded-2xl bg-slate-50 p-4">
+    {{if .BelowMin}}
+    <p class="text-xs font-semibold text-rose-600">Di bawah harga minimal</p>
+    <p class="text-xs text-rose-600/80 font-medium mt-1">Transaksi akan ditolak sampai manajer menyetujui.</p>
+    {{else}}
+    <p class="text-xs font-semibold text-slate-600">Laba unit</p>
+    <p class="text-xs text-slate-500 font-medium mt-1">Modal dan laba tidak ditampilkan untuk peran ini.</p>
+    {{end}}
+  </div>
+  {{end}}
+
+  <div class="mt-5 space-y-2.5">
+    <button type="submit" class="w-full py-3.5 rounded-2xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800  transition active:scale-[.99]">Selesaikan penjualan</button>
+    <a href="/persetujuan" class="block w-full py-3 rounded-2xl bg-white border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition text-center">Lihat persetujuan</a>
+  </div>
+
+  <p class="text-xs text-slate-500 font-medium text-center mt-4">Stok langsung berkurang setelah transaksi tersimpan.</p>
+</div>
+{{end}}
+
+{{define "purchase_summary"}}
+<div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm lg:sticky lg:top-6 space-y-4" id="purchase-summary">
+  <div>
+    <h2 class="text-base font-semibold text-slate-900">Pratinjau harga</h2>
+    <p class="text-xs text-slate-500 font-medium mt-0.5">{{.Selected.Name}} · {{.Selected.Variant}} · Grade {{.Grade}}</p>
+  </div>
+
+  {{if not .Q.Count}}
+  <div class="rounded-2xl bg-amber-50 p-4">
+    <p class="text-xs font-semibold text-amber-700">Data kurang</p>
+    <p class="text-xs text-amber-600/90 font-medium mt-1">Belum ada pembanding. Pembelian akan masuk antrean persetujuan.</p>
+  </div>
+  {{else}}
+  <dl class="space-y-3 text-sm">
+    <div class="flex items-center justify-between">
+      <dt class="text-slate-500 font-medium">Harga pasar</dt>
+      <dd class="font-semibold text-slate-900">{{rp .Q.Market}}</dd>
+    </div>
+    <div class="flex items-center justify-between">
+      <dt class="text-slate-500 font-medium">Batas beli</dt>
+      <dd class="font-semibold text-amber-600">{{rp .Q.BuyLimit}}</dd>
+    </div>
+    <div class="flex items-center justify-between">
+      <dt class="text-slate-500 font-medium">Harga jual</dt>
+      <dd class="font-semibold text-slate-900">{{rp .Q.Recommended}}</dd>
+    </div>
+    <div class="flex items-center justify-between">
+      <dt class="text-slate-500 font-medium">Data dipakai</dt>
+      <dd class="text-xs font-semibold text-slate-600">{{.Q.Count}} · target {{.TargetPct}}%</dd>
+    </div>
+  </dl>
+  {{end}}
+
+  {{if gt .Deal 0}}
+  <div class="rounded-2xl p-4 {{if .NeedsApproval}}bg-rose-50{{else}}bg-emerald-50{{end}}">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-semibold {{if .NeedsApproval}}text-rose-700{{else}}text-emerald-700{{end}}">{{if .NeedsApproval}}Butuh persetujuan{{else}}Aman dibeli{{end}}</span>
+      <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{if .NeedsApproval}}bg-rose-100 text-rose-700{{else}}bg-emerald-100 text-emerald-700{{end}}">{{if .NeedsApproval}}di atas batas{{else}}≤ batas{{end}}</span>
+    </div>
+    <p class="text-xl font-semibold {{if .NeedsApproval}}text-rose-700{{else}}text-emerald-700{{end}} tracking-tight mt-1">{{rp .Q.BuyLimit}}</p>
+    <p class="text-xs font-medium {{if .NeedsApproval}}text-rose-600/80{{else}}text-emerald-600/80{{end}} mt-0.5">Deal {{rp .Deal}} · modal {{rp .ModalCost}}</p>
+  </div>
+  <div class="flex items-center justify-between text-xs">
+    <span class="text-slate-500 font-medium">Estimasi laba</span>
+    <span class="font-semibold {{if gt .Profit 0}}text-emerald-600{{else}}text-rose-500{{end}}">{{rp .Profit}}</span>
+  </div>
+  {{if .NeedsApproval}}
+  <p class="text-xs text-slate-500 font-medium">Unit tersimpan dengan status menunggu sampai disetujui manajer.</p>
+  {{end}}
+  {{else}}
+  <p class="text-xs text-slate-500 font-medium">Isi harga deal untuk melihat status dan estimasi laba.</p>
+  {{end}}
+</div>
+{{end}}

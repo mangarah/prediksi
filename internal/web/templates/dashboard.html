@@ -1,0 +1,228 @@
+{{define "content"}}
+<section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-3xl font-medium tracking-tight text-slate-900">Dashboard</h1>
+    <p class="text-sm text-slate-500 font-medium mt-1">Ringkasan toko hari ini.</p>
+  </div>
+  <div class="flex items-center space-x-2">
+    <span class="inline-flex items-center space-x-2 px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm">Hari ini</span>
+    <a href="/persetujuan" class="inline-flex items-center space-x-2 px-3.5 py-2 bg-white rounded-2xl border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition">Persetujuan ({{.Data.KPIs.Pending}})</a>
+  </div>
+</section>
+
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+  <div class="bg-teal-700 rounded-3xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between h-48">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium text-teal-100">Laba hari ini</span>
+      <a href="/kasir" class="w-8 h-8 rounded-full bg-teal-800 hover:bg-teal-900 flex items-center justify-center text-white transition-colors" aria-label="Buka kasir">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+    <div>
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span class="text-3xl font-medium tracking-tight whitespace-nowrap">{{rp .Data.KPIs.ProfitToday}}</span>
+        <span class="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-white/20 text-white">{{.Data.KPIs.SalesToday}} penjualan</span>
+      </div>
+      <p class="text-xs text-teal-200 mt-2 font-medium">Laba kotor unit yang terjual hari ini</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-48 transition-colors hover:border-slate-200">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-semibold text-slate-600">Penjualan hari ini</span>
+      <a href="/kasir" class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" aria-label="Buka kasir">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+    <div>
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span class="text-3xl font-medium text-slate-900 tracking-tight whitespace-nowrap">{{.Data.KPIs.SalesToday}} <span class="text-xl font-semibold text-slate-800">unit</span></span>
+        <span class="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">{{rp .Data.KPIs.RevenueToday}}</span>
+      </div>
+      <p class="text-xs text-slate-500 mt-2 font-medium">Nilai transaksi hari ini</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-48 transition-colors hover:border-slate-200">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-semibold text-slate-600">Stok siap jual</span>
+      <a href="/kasir" class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" aria-label="Buka kasir">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+    <div>
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span class="text-3xl font-medium text-slate-900 tracking-tight whitespace-nowrap">{{.Data.KPIs.ReadyUnits}} <span class="text-xl font-semibold text-slate-800">unit</span></span>
+        <span class="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{{rp .Data.KPIs.StockValue}}</span>
+      </div>
+      <p class="text-xs text-slate-500 mt-2 font-medium">Nilai modal stok aktif</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between h-48 transition-colors hover:border-slate-200">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-semibold text-slate-600">Stok mengendap</span>
+      <a href="/dashboard#stok" class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition" aria-label="Lihat stok">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+    <div>
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span class="text-3xl font-medium text-slate-900 tracking-tight whitespace-nowrap">{{.Data.KPIs.StaleUnits}} <span class="text-xl font-semibold text-slate-800">unit</span></span>
+        {{if gt .Data.KPIs.StaleUnits 0}}<span class="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">perlu turun harga</span>{{end}}
+      </div>
+      <p class="text-xs text-slate-500 mt-2 font-medium">Lebih dari 30 hari belum laku</p>
+    </div>
+  </div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="lg:col-span-4 xl:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-5">
+    <a href="/persetujuan" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm relative flex flex-col justify-between transition-colors hover:border-slate-200">
+      <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-700">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </div>
+      <div class="mt-8">
+        <h3 class="text-3xl font-medium text-slate-900 tracking-tight">{{.Data.KPIs.Pending}} <span class="text-xl font-semibold text-slate-800">persetujuan</span></h3>
+        <p class="text-xs text-slate-500 mt-1 font-medium">{{if gt .Data.KPIs.Pending 0}}Menunggu keputusanmu.{{else}}Tidak ada yang menunggu.{{end}}</p>
+      </div>
+    </a>
+
+    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm relative overflow-hidden flex flex-col justify-between">
+      <div class="flex items-center justify-between">
+        <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </div>
+        <a href="/kasir" class="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md hover:bg-slate-800 transition" aria-label="Buka kasir">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </a>
+      </div>
+      <div class="mt-8">
+        <h3 class="text-3xl font-medium text-slate-900 tracking-tight">{{rp .Data.KPIs.CashToday}}</h3>
+        <p class="text-xs text-slate-500 mt-1 font-medium">Penerimaan tunai hari ini.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="lg:col-span-8 xl:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center space-x-2">
+        <h2 class="text-base font-semibold text-slate-900">Penjualan</h2>
+        <span class="text-xs text-slate-500 font-medium">7 hari terakhir</span>
+      </div>
+      <a href="/kasir" class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition" aria-label="Buka kasir">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+    <div class="pt-6 pb-2">
+      <div class="flex items-end h-56 w-full space-x-2 sm:space-x-3.5">
+        <div class="flex flex-col justify-between h-full text-xs font-semibold text-slate-500 pr-2 select-none">
+          <span>{{rpShort .Data.DayMax}}</span>
+          <span>{{rpShort .Data.DayQ3}}</span>
+          <span>{{rpShort .Data.DayQ2}}</span>
+          <span>{{rpShort .Data.DayQ1}}</span>
+          <span>Rp 0</span>
+        </div>
+        {{range $i, $d := .Data.Days}}
+        <div class="flex-1 flex flex-col items-center h-full justify-end group{{if eq $i 6}} relative{{end}}">
+          {{if eq $i 6}}<div class="absolute -top-3 text-xs font-semibold text-slate-700 bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100 -translate-y-1 whitespace-nowrap">{{rp $d.Total}}</div>{{end}}
+          <div class="w-full max-w-[2.25rem] bg-teal-700 rounded-t-xl bar-column{{if eq $i 6}} ring-2 ring-teal-300/40{{end}}" style="height: {{$d.Height}}%;"></div>
+          <span class="text-xs font-semibold {{if eq $i 6}}text-slate-800{{else}}text-slate-500{{end}} mt-3">{{$d.Label}}</span>
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </div>
+
+  <div class="lg:col-span-12 xl:col-span-4 bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center space-x-2">
+        <h2 class="text-base font-semibold text-slate-900">Penjualan per kategori</h2>
+        <span class="text-xs text-slate-500 font-medium">30 hari</span>
+      </div>
+      <a href="/dashboard#laporan" class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition" aria-label="Buka laporan">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 py-4">
+      <div class="relative w-44 h-44 flex items-center justify-center shrink-0">
+        <svg class="w-44 h-44 -rotate-90 transform" viewBox="0 0 160 160" role="img" aria-label="Komposisi penjualan per kategori">
+          <circle cx="80" cy="80" fill="transparent" r="54" stroke="#f1f5f9" stroke-width="22"></circle>
+          {{range .Data.Cats}}<circle class="donut-segment" cx="80" cy="80" fill="transparent" r="54" stroke="{{.Color}}" stroke-dasharray="{{.Dash}} {{.Rest}}" stroke-dashoffset="{{.Offset}}" stroke-width="22"></circle>{{end}}
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span class="text-lg font-semibold text-slate-800">{{.Data.CatTotal}}</span>
+          <span class="text-xs font-semibold text-slate-500">unit terjual</span>
+        </div>
+      </div>
+      <div class="space-y-2.5 w-full text-xs font-medium text-slate-600">
+        {{range .Data.Cats}}
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center space-x-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: {{.Color}}"></span>
+            <span class="truncate">{{.Name}}</span>
+          </div>
+          <span class="font-semibold text-slate-800 shrink-0">{{.Pct}}%</span>
+        </div>
+        {{else}}
+        <p class="text-xs text-slate-500">Belum ada penjualan 30 hari terakhir.</p>
+        {{end}}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="space-y-6 pt-4" id="stok">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <h2 class="text-2xl font-medium tracking-tight text-slate-900">Stok &amp; unit</h2>
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold text-slate-500">{{.Data.KPIs.ReadyUnits}} unit siap jual</span>
+      <a href="/pembelian" class="inline-flex items-center space-x-1.5 px-4 py-2 rounded-2xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800  transition active:scale-95"><span class="text-sm leading-none">+</span><span>Catat pembelian</span></a>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500">
+            <th scope="col" class="py-3.5 pl-6 pr-3">Unit</th>
+            <th scope="col" class="py-3.5 px-3">Model</th>
+            <th scope="col" class="py-3.5 px-3">Grade</th>
+            <th scope="col" class="py-3.5 px-3">Modal</th>
+            <th scope="col" class="py-3.5 px-3">Harga jual</th>
+            <th scope="col" class="py-3.5 px-3">Umur</th>
+            <th scope="col" class="py-3.5 px-3">Cabang</th>
+            <th scope="col" class="py-3.5 px-3">Status</th>
+            <th scope="col" class="py-3.5 pr-6 pl-3 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+          {{range .Data.Units}}
+          <tr class="hover:bg-slate-50/60 transition">
+            <td class="py-4 pl-6 pr-3 font-semibold text-slate-900"><a href="/unit/{{.ID}}" class="hover:text-teal-700">№{{.Code}}</a></td>
+            <td class="py-4 px-3">
+              <div class="font-semibold text-slate-900">{{.Model}} {{.Variant}}</div>
+              <div class="text-xs text-slate-500">{{if .Serial}}{{.Serial}}{{else}}—{{end}}</div>
+            </td>
+            <td class="py-4 px-3 text-slate-600">{{.Grade}}</td>
+            <td class="py-4 px-3 text-slate-600">{{rp .Cost}}</td>
+            <td class="py-4 px-3 font-semibold text-slate-900">{{rp .ListedPrice}}</td>
+            <td class="py-4 px-3 font-{{if gt .AgeDays 30}}semibold text-amber-600{{else}}medium text-slate-500{{end}}">{{.AgeDays}} hari</td>
+            <td class="py-4 px-3 text-slate-600">{{.Branch}}</td>
+            <td class="py-4 px-3">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{statusPill .Status}}">{{statusLabel .Status}}</span>
+            </td>
+            <td class="py-4 pr-6 pl-3 text-right whitespace-nowrap">
+              {{if eq .Status "siap"}}<a href="/kasir?unit={{.ID}}" class="text-teal-700 hover:text-teal-700 font-semibold text-xs">Jual</a> · {{end}}<a href="/label/{{.ID}}" target="_blank" class="text-slate-500 hover:text-slate-800 font-semibold text-xs">Label</a>
+            </td>
+          </tr>
+          {{else}}
+          <tr><td colspan="9" class="py-10 text-center text-slate-500 font-medium">Belum ada unit. <a class="text-teal-700 font-semibold" href="/pembelian">Catat pembelian pertama</a>.</td></tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{{end}}
