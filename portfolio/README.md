@@ -30,11 +30,15 @@ Halaman memakai font Google; tanpa internet, font jatuh ke fallback sistem dan t
 
 ### GitHub Pages (otomatis)
 
-Workflow `.github/workflows/pages.yml` menerbitkan folder ini setiap push ke `main`.
+Workflow `.github/workflows/pages.yml` menyalin folder ini ke branch `gh-pages` setiap push ke `main` yang menyentuh `portfolio/`.
 
-1. Push repo ke GitHub.
-2. Buka **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Push perubahan di `portfolio/` atau jalankan workflow manual.
+Setelan sekali di GitHub:
+
+1. Buka **Settings → Pages → Build and deployment**.
+2. Pilih **Source: Deploy from a branch**.
+3. Pilih branch **`gh-pages`**, folder **`/ (root)`**, lalu **Save**.
+
+Setelah itu setiap perubahan `portfolio/` terbit otomatis. Workflow manual ada di tab **Actions → Publish portfolio → Run workflow**.
 
 ### Tanpa GitHub Actions
 
