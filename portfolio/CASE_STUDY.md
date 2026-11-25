@@ -1,6 +1,6 @@
 # Prediksi — sistem harga & stok barang second
 
-Studi kasus portofolio. Aplikasi internal untuk toko gadget second: menilai harga pasar, menetapkan batas beli, dan menjaga laba per unit dari pembelian sampai kas harian.
+Studi kasus portofolio oleh **Willyam Mangarahon Simanjuntak**. Aplikasi internal untuk toko gadget second: menilai harga pasar, menetapkan batas beli, dan menjaga laba per unit dari pembelian sampai kas harian.
 
 - **Peran:** solo developer, end-to-end
 - **Stack:** Go, MySQL 8, HTML + Tailwind, HTMX
@@ -83,6 +83,9 @@ Akun demo:
 | Buyer | buyer@toko.local | buyer123 |
 
 ## Kontak
+
+Portofolio: https://mangarah.github.io/
+GitHub: https://github.com/mangarah
 
 Kode dan demo tersedia atas permintaan.
 
